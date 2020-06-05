@@ -74,7 +74,11 @@
         },
       });
       const bb = cy.bubbleSets();
-      bb.addPath(cy.nodes(), cy.edges());
+      const edges = cy.edges().slice(0, 4);
+      const nodes = edges.connectedNodes();
+      bb.addPath(nodes, edges, cy.nodes().diff(nodes).left, {
+        drawPotentialArea: true,
+      });
     </script>
   </body>
 </html>
