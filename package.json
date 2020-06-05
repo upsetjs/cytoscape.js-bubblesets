@@ -28,7 +28,9 @@
   ],
   "dependencies": {
     "@types/cytoscape": "^3.14.3",
-    "bubblesets-js": "^2.0.2"
+    "@types/lodash.throttle": "^4.1.6",
+    "bubblesets-js": "^2.0.2",
+    "lodash.throttle": "^4.1.1"
   },
   "peerDependencies": {
     "cytoscape": "^3.14.0"
@@ -65,7 +67,8 @@
   "scripts": {
     "clean": "rimraf dist .tmp node_modules",
     "compile": "tsc -p tsconfig.json --noEmit",
-    "start": "tsdx watch --noClean --name CytoscapeBubbleSets --format esm,umd",
+    "start": "npm run watch",
+    "watch": "tsdx watch --noClean --name CytoscapeBubbleSets --format esm,umd",
     "build": "npm run clean && tsdx build --name CytoscapeBubbleSets --format esm,umd && npm run typings",
     "typings": "tsc -p tsconfig.dts.json && rollup -c rollup.dts.config.js",
     "test": "tsdx test --passWithNoTests",
@@ -82,5 +85,8 @@
     "prepare": "npm run build",
     "release": "release-it --disable-metrics --npm.skipChecks",
     "release:pre": "release-it --disable-metrics --npm.skipChecks --preRelease=alpha --npm.tag=next"
+  },
+  "resolutions": {
+    "bubblesets-js": "portal:/D:/w/bubblesets-js"
   }
 }

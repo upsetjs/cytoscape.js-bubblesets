@@ -6,7 +6,7 @@ export default {
     file: 'dist/index.d.ts',
     format: 'es',
   },
-  externals: ['cytoscape'],
+  externals: ['cytoscape', 'bubblesets-js'],
   plugins: [
     dts({
       respectExternal: true,

@@ -9,7 +9,9 @@ module.exports = {
     // }
 
     config.output.globals['cytoscape'] = 'cytoscape';
-    // const base = config.external;
+    config.output.globals['bubblesets-js'] = 'BubbleSets';
+    const base = config.external;
+    config.external = (v) => v === 'cytoscape';
 
     const c = config.plugins.findIndex((d) => d.name === 'commonjs');
     if (c !== -1) {
