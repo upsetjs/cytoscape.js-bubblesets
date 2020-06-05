@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
+    "importHelpers": true,
+    "declaration": false,
+    "sourceMap": true,
+    "strict": true,
+    "importsNotUsedAsValues": "remove",
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "strictBindCallApply": true,
+    "stripInternal": true,
+    "resolveJsonModule": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "jsx": "react",
+    "esModuleInterop": true,
+    "rootDir": "./src",
+    "baseUrl": "./",
+    "outDir": "./dist",
+    "paths": {
+      "@": ["./src"],
+      "*": ["*", "node_modules/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+
+  "typedocOptions": {
+    "name": "UpSet.js Model",
+    "out": "./docs",
+    "mode": "library",
+    "theme": "minimal",
+    "excludeNotExported": true,
+    "excludeExternals": true,
+    "excludePrivate": true,
+    "includeVersion": true,
+    "hideGenerator": true,
+    "entryPoint": "\"index\""
+  }
+}
