@@ -296,7 +296,7 @@ class BubbleSetsPlugin {
     const oPixelRatio = options.pixelRatio ?? 'auto';
     this.pixelRatio = oPixelRatio === 'auto' ? window.devicePixelRatio : oPixelRatio;
 
-    cy.one('render', () => {
+    cy.on('render', () => {
       this.draw();
     });
     cy.on(
