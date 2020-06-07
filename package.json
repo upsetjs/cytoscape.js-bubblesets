@@ -1,6 +1,6 @@
 {
   "name": "cytoscape-bubblesets",
-  "description": "",
+  "description": "Cytoscape.js plugin for rendering bubblesets",
   "version": "1.0.0",
   "author": {
     "name": "Samuel Gratzl",

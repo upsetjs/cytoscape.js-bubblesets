@@ -21,10 +21,39 @@ or at this [![Open in CodePen][codepen]](https://codepen.io/sgratzl/pen/TODO)
 ```js
 import cytoscape from 'cytoscape';
 import BubbleSets from 'cytoscape-bubblesets';
-
 cytoscape.use(BubbleSets);
 
+const cy = cytoscape({
+  container: document.getElementById('app'),
+  elements: [
+    { data: { id: 'a' } },
+    { data: { id: 'b' } },
+    {
+      data: {
+        id: 'ab',
+        source: 'a',
+        target: 'b',
+      },
+    },
+  ],
+});
+cy.ready(() => {
+  const bb = cy.bubbleSets();
+  bb.addPath(cy.nodes(), cy.edges(), null);
+});
 ```
+
+![image](https://user-images.githubusercontent.com/4129778/83965802-8cebcf80-a8b6-11ea-9481-1744521fe8a1.png)
+
+## API
+
+- `addPath(nodes: NodeCollection, edges: EdgeCollection | null, avoidNodes: NodeCollection | null, options?: IBubbleSetPathOptions): BubbleSetPath`
+
+  creates a new `BubbleSetPath` instance. The `nodes` is a node collection that should be linked. `edges` an edge collection to include edges. `avoidNodes` is an optional node collection of nodes that should be avoided when generating the outline and any virtual edge between the nodes.
+
+- `removePath(path: BubbleSetPath)`
+
+  removes a path again
 
 ## Development Environment
 

@@ -40,14 +40,16 @@ export default class BubbleSetsPlugin {
         this.update();
       }, 200)
     );
-    cy.on('resize', () => {
+    const resize = () => {
       canvas.width = cy.width() * this.pixelRatio;
       canvas.height = cy.height() * this.pixelRatio;
 
       canvas.style.width = `${canvas.width}px`;
       canvas.style.height = `${canvas.height}px`;
       this.draw();
-    });
+    };
+    cy.on('resize', resize);
+    resize();
   }
 
   addPath(
@@ -58,6 +60,8 @@ export default class BubbleSetsPlugin {
   ) {
     const path = new BubbleSetPath(this, nodes, edges, avoidNodes, Object.assign({}, this.options, options));
     this.paths.push(path);
+    path.update();
+    this.draw();
     return path;
   }
 

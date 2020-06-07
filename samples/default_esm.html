@@ -35,15 +35,14 @@
             data: {
               id: 'ab',
               source: 'a',
-              target: 'b'
-            }
-          }]
+              target: 'b',
+            },
+          },
+        ],
       });
       cy.ready(() => {
         const bb = cy.bubbleSets();
-        bb.addPath(cy.nodes(), cy.edges(), null, {
-          drawPotentialArea: true,
-        });
+        bb.addPath(cy.nodes(), cy.edges(), null);
       });
     </script>
   </body>
