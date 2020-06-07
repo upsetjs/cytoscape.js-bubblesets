@@ -3038,39 +3038,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bubblesets-js@portal:/D:/w/bubblesets-js::locator=cytoscape.js-bubblesets%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "bubblesets-js@portal:/D:/w/bubblesets-js::locator=cytoscape.js-bubblesets%40workspace%3A."
+"bubblesets-js@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "bubblesets-js@npm:2.1.0"
   dependencies:
-    "@rollup/plugin-commonjs": ^12.0.0
     "@types/d3-contour": ^1.3.0
-    "@types/jest": ^25.2.3
-    "@typescript-eslint/eslint-plugin": ^3.0.2
-    "@typescript-eslint/parser": ^3.0.2
-    "@yarnpkg/pnpify": ^2.0.0-rc.22
     d3-contour: ^1.3.2
-    eslint: ^7.1.0
-    eslint-config-prettier: ^6.11.0
-    eslint-config-react-app: ^5.2.1
-    eslint-plugin-flowtype: ^5.1.3
-    eslint-plugin-import: ^2.20.2
-    eslint-plugin-jsx-a11y: ^6.2.3
-    eslint-plugin-prettier: ^3.1.3
-    eslint-plugin-react: ^7.20.0
-    eslint-plugin-react-hooks: ^4.0.4
-    prettier: ^2.0.5
-    release-it: ^13.6.1
-    rimraf: ^3.0.2
-    rollup: ^2.12.0
-    rollup-plugin-cleanup: ^3.1.1
-    rollup-plugin-dts: ^1.4.7
-    rollup-plugin-pnp-resolve: ^2.0.0
-    tsdx: ~0.13.2
-    tslib: ^2.0.0
-    typedoc: ^0.17.7
-    typescript: ^3.9.3
+  checksum: 3/b77020b05aaf9c924afdbf1c87f92ae0b6a48b636374eee18c5936a2947e044da22fd1dd33fcd116a24a152037404323dbb3694e485b5ab7b4f3b0451d85935f
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "buffer-from@npm:1.x, buffer-from@npm:^1.0.0":
   version: 1.1.1
@@ -3605,9 +3581,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cytoscape.js-bubblesets@workspace:.":
+"cytoscape-bubblesets@workspace:.":
   version: 0.0.0-use.local
-  resolution: "cytoscape.js-bubblesets@workspace:."
+  resolution: "cytoscape-bubblesets@workspace:."
   dependencies:
     "@rollup/plugin-commonjs": ^12.0.0
     "@types/cytoscape": ^3.14.3
