@@ -1,4 +1,4 @@
-import { NodeCollection, EdgeCollection, NodeSingular, BoundingBoxWH, BoundingBox12, EdgeSingular } from 'cytoscape';
+import cy from 'cytoscape';
 import {
   IOutlineOptions,
   PointPath,
@@ -35,12 +35,12 @@ export interface ICanvasStyle {
   strokeStyle?: string | CanvasGradient | CanvasPattern;
 }
 
-export interface IBubbleSetNodeData {
+interface IBubbleSetNodeData {
   area?: Area;
   isCircle: boolean;
   shape: Circle | Rectangle;
 }
-export interface IBubbleSetEdgeData {
+interface IBubbleSetEdgeData {
   lines: Line[];
   areas: Area[];
 }
@@ -68,7 +68,7 @@ function linesEquals(a: ILine[], b: ILine[]) {
   return a.length === b.length && a.every((ai, i) => toEdgeKey(ai) === toEdgeKey(b[i]));
 }
 
-function createShape(isCircle: boolean, bb: BoundingBox12 & BoundingBoxWH) {
+function createShape(isCircle: boolean, bb: cy.BoundingBox12 & cy.BoundingBoxWH) {
   return isCircle
     ? new Circle(bb.x1 + bb.w / 2, bb.y1 + bb.h / 2, Math.max(bb.w, bb.h) / 2)
     : new Rectangle(bb.x1, bb.y1, bb.w, bb.h);
@@ -85,9 +85,9 @@ export default class BubbleSetPath {
 
   constructor(
     private readonly plugin: { draw(): void; removePath(path: BubbleSetPath): boolean },
-    public readonly nodes: NodeCollection,
-    public readonly edges: EdgeCollection | null,
-    public readonly avoidNodes: NodeCollection | null,
+    public readonly nodes: cy.NodeCollection,
+    public readonly edges: cy.EdgeCollection | null,
+    public readonly avoidNodes: cy.NodeCollection | null,
     options: IBubbleSetPathOptions = {}
   ) {
     this.options = Object.assign(
@@ -156,7 +156,7 @@ export default class BubbleSetPath {
     }
 
     let updateEdges = false;
-    const updateNodeData = (n: NodeSingular) => {
+    const updateNodeData = (n: cy.NodeSingular) => {
       const bb = n.boundingBox(this.options);
       let data = (n.scratch(SCRATCH_KEY) ?? null) as IBubbleSetNodeData | null;
       const isCircle = isCircleShape(n.style('shape'));
@@ -206,7 +206,7 @@ export default class BubbleSetPath {
 
     if (!potentialAreaDirty) {
       this.virtualEdgeAreas.forEach((value, key) => edgeCache.set(key, value));
-      (this.edges ?? []).forEach((n: EdgeSingular) => {
+      (this.edges ?? []).forEach((n: cy.EdgeSingular) => {
         const data = (n.scratch(SCRATCH_KEY) ?? null) as IBubbleSetEdgeData | null;
         if (data && data.lines) {
           data.lines.forEach((line, i) => {
@@ -229,7 +229,7 @@ export default class BubbleSetPath {
     };
     const edges: Area[] = [];
 
-    (this.edges ?? []).forEach((e: EdgeSingular) => {
+    (this.edges ?? []).forEach((e: cy.EdgeSingular) => {
       const ps = (e.segmentPoints() ?? [e.sourceEndpoint(), e.targetEndpoint()]).map((d) => Object.assign({}, d));
       if (ps.length === 0) {
         return;

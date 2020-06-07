@@ -1,6 +1,9 @@
 const commonjs = require('@rollup/plugin-commonjs');
 const resolve = require('rollup-plugin-pnp-resolve');
 const cleanup = require('rollup-plugin-cleanup');
+const fs = require('fs');
+
+const pkg = JSON.parse(fs.readFileSync('./package.json'));
 
 module.exports = {
   rollup(config, options) {
@@ -9,9 +12,9 @@ module.exports = {
     // }
 
     config.output.globals['cytoscape'] = 'cytoscape';
-    config.output.globals['bubblesets-js'] = 'BubbleSets';
     const base = config.external;
-    config.external = (v) => v === 'cytoscape';
+    const external = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.peerDependencies || {}));
+    config.external = (v) => (base(v) ? external.includes(v) : false);
 
     const c = config.plugins.findIndex((d) => d.name === 'commonjs');
     if (c !== -1) {

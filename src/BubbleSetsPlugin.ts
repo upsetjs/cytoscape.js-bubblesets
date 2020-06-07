@@ -1,4 +1,4 @@
-import { Core, EdgeCollection, NodeCollection } from 'cytoscape';
+import cy from 'cytoscape';
 import throttle from 'lodash.throttle';
 import BubbleSetPath, { IBubbleSetPathOptions } from './BubbleSetPath';
 
@@ -14,7 +14,7 @@ export default class BubbleSetsPlugin {
   private readonly pixelRatio: number;
   private readonly paths: BubbleSetPath[] = [];
 
-  constructor(private readonly cy: Core, private readonly options: IBubbleSetsPluginOptions = {}) {
+  constructor(private readonly cy: cy.Core, private readonly options: IBubbleSetsPluginOptions = {}) {
     const container = cy.container();
 
     const canvas = (this.canvas = (container?.ownerDocument ?? document).createElement('canvas'));
@@ -53,9 +53,9 @@ export default class BubbleSetsPlugin {
   }
 
   addPath(
-    nodes: NodeCollection,
-    edges: EdgeCollection | null,
-    avoidNodes: NodeCollection | null,
+    nodes: cy.NodeCollection,
+    edges: cy.EdgeCollection | null,
+    avoidNodes: cy.NodeCollection | null,
     options: IBubbleSetPathOptions = {}
   ) {
     const path = new BubbleSetPath(this, nodes, edges, avoidNodes, Object.assign({}, this.options, options));
@@ -107,6 +107,6 @@ export default class BubbleSetsPlugin {
   }
 }
 
-export function bubbleSets(this: Core, options: IBubbleSetsPluginOptions = {}) {
+export function bubbleSets(this: cy.Core, options: IBubbleSetsPluginOptions = {}) {
   return new BubbleSetsPlugin(this, options);
 }
