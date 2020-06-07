@@ -73,11 +73,13 @@
           ],
         },
       });
-      const bb = cy.bubbleSets();
-      const edges = cy.edges().slice(0, 4);
-      const nodes = edges.connectedNodes();
-      bb.addPath(nodes, edges, cy.nodes().diff(nodes).left, {
-        drawPotentialArea: true,
+      cy.ready(() => {
+        const bb = cy.bubbleSets();
+        const edges = cy.edges().slice(0, 4);
+        const nodes = edges.connectedNodes();
+        bb.addPath(nodes, edges, cy.nodes().diff(nodes).left, {
+          drawPotentialArea: true,
+        });
       });
     </script>
   </body>

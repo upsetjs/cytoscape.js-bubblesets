@@ -1,12 +1,4 @@
-import {
-  Core,
-  NodeCollection,
-  EdgeCollection,
-  NodeSingular,
-  BoundingBoxWH,
-  BoundingBox12,
-  EdgeSingular,
-} from 'cytoscape';
+import { NodeCollection, EdgeCollection, NodeSingular, BoundingBoxWH, BoundingBox12, EdgeSingular } from 'cytoscape';
 import {
   IOutlineOptions,
   PointPath,
@@ -27,7 +19,7 @@ import {
 } from 'bubblesets-js';
 import throttle from 'lodash.throttle';
 
-export interface IPathOptions extends IOutlineOptions, IPotentialOptions, ICanvasStyle, IRoutingOptions {
+export interface IBubbleSetPathOptions extends IOutlineOptions, IPotentialOptions, ICanvasStyle, IRoutingOptions {
   throttle?: number;
   drawPotentialArea?: boolean;
 
@@ -41,11 +33,6 @@ export interface IPathOptions extends IOutlineOptions, IPotentialOptions, ICanva
 export interface ICanvasStyle {
   fillStyle?: string | CanvasGradient | CanvasPattern;
   strokeStyle?: string | CanvasGradient | CanvasPattern;
-}
-
-export interface IBubbleSetsPluginOptions extends IPathOptions {
-  zIndex?: number;
-  pixelRatio?: 'auto' | number;
 }
 
 export interface IBubbleSetNodeData {
@@ -66,7 +53,7 @@ const SCRATCH_KEY = 'bubbleSets';
 const circularBase = ['ellipse', 'diamond', 'diamond', 'pentagon', 'diamond', 'hexagon', 'heptagon', 'octagon', 'star'];
 const circular = new Set(circularBase.concat(circularBase.map((v) => `round-${v}`)));
 
-function useCircle(shape: string) {
+function isCircleShape(shape: string) {
   return circular.has(shape);
 }
 
@@ -87,21 +74,21 @@ function createShape(isCircle: boolean, bb: BoundingBox12 & BoundingBoxWH) {
     : new Rectangle(bb.x1, bb.y1, bb.w, bb.h);
 }
 
-class BubbleSetPath {
+export default class BubbleSetPath {
   private path = new PointPath([]);
   private activeArea: IRectangle = { x: 0, y: 0, width: 0, height: 0 };
   private potentialArea: Area = new Area(4, 0, 0, 0, 0, 0, 0);
-  private readonly options: Required<IPathOptions>;
+  private readonly options: Required<IBubbleSetPathOptions>;
   private readonly virtualEdgeAreas = new Map<string, Area>();
 
   private readonly throttledUpdate: () => void;
 
   constructor(
-    private readonly plugin: BubbleSetsPlugin,
+    private readonly plugin: { draw(): void; removePath(path: BubbleSetPath): boolean },
     public readonly nodes: NodeCollection,
     public readonly edges: EdgeCollection | null,
     public readonly avoidNodes: NodeCollection | null,
-    options: IPathOptions = {}
+    options: IBubbleSetPathOptions = {}
   ) {
     this.options = Object.assign(
       {},
@@ -172,7 +159,7 @@ class BubbleSetPath {
     const updateNodeData = (n: NodeSingular) => {
       const bb = n.boundingBox(this.options);
       let data = (n.scratch(SCRATCH_KEY) ?? null) as IBubbleSetNodeData | null;
-      const isCircle = useCircle(n.style('shape'));
+      const isCircle = isCircleShape(n.style('shape'));
       if (
         !data ||
         potentialAreaDirty ||
@@ -339,105 +326,4 @@ class BubbleSetPath {
     }
     this.plugin.removePath(this);
   }
-}
-
-// canvas ideas based on https://github.com/classcraft/cytoscape.js-canvas
-
-class BubbleSetsPlugin {
-  // private readonly bb: BubbleSets;
-  readonly canvas: HTMLCanvasElement;
-  private readonly pixelRatio: number;
-  private readonly paths: BubbleSetPath[] = [];
-
-  constructor(private readonly cy: Core, private readonly options: IBubbleSetsPluginOptions = {}) {
-    const container = cy.container();
-
-    const canvas = (this.canvas = (container?.ownerDocument ?? document).createElement('canvas'));
-    if (container) {
-      container.appendChild(canvas);
-    }
-    canvas.style.zIndex = (options.zIndex ?? 1).toString();
-    canvas.style.position = 'absolute';
-    canvas.style.left = '0';
-    canvas.style.top = '0';
-    canvas.style.userSelect = 'none';
-    canvas.style.outlineStyle = 'none';
-
-    const oPixelRatio = options.pixelRatio ?? 'auto';
-    this.pixelRatio = oPixelRatio === 'auto' ? window.devicePixelRatio : oPixelRatio;
-
-    cy.on('render', () => {
-      this.draw();
-    });
-    cy.on(
-      'layoutstop move',
-      throttle(() => {
-        this.update();
-      }, 200)
-    );
-    cy.on('resize', () => {
-      canvas.width = cy.width() * this.pixelRatio;
-      canvas.height = cy.height() * this.pixelRatio;
-
-      canvas.style.width = `${canvas.width}px`;
-      canvas.style.height = `${canvas.height}px`;
-      this.draw();
-    });
-  }
-
-  addPath(
-    nodes: NodeCollection,
-    edges: EdgeCollection | null,
-    avoidNodes: NodeCollection | null,
-    options: IPathOptions = {}
-  ) {
-    const path = new BubbleSetPath(this, nodes, edges, avoidNodes, Object.assign({}, this.options, options));
-    this.paths.push(path);
-    return path;
-  }
-
-  removePath(path: BubbleSetPath) {
-    const i = this.paths.indexOf(path);
-    if (i < 0) {
-      return false;
-    }
-    this.paths.splice(i, 1);
-    return true;
-  }
-
-  get ctx() {
-    return this.canvas.getContext('2d')!;
-  }
-
-  clear() {
-    const ctx = this.ctx;
-    ctx.save();
-    ctx.resetTransform();
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.restore();
-  }
-
-  update() {
-    this.paths.forEach((p) => p.update());
-    this.draw();
-  }
-
-  draw() {
-    this.clear();
-    const pan = this.cy.pan();
-    const zoom = this.cy.zoom();
-    const ctx = this.ctx;
-    ctx.save();
-    ctx.resetTransform();
-    ctx.translate(pan.x * this.pixelRatio, pan.y * this.pixelRatio);
-    ctx.scale(zoom * this.pixelRatio, zoom * this.pixelRatio);
-
-    this.paths.forEach((p) => p.draw(ctx));
-
-    ctx.restore();
-  }
-}
-
-export function bubbleSets(this: Core, options: IBubbleSetsPluginOptions = {}) {
-  return new BubbleSetsPlugin(this, options);
 }

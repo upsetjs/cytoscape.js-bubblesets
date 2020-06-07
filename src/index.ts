@@ -1,5 +1,6 @@
-import { bubbleSets } from './extension';
-export * from './extension';
+import { bubbleSets } from './BubbleSetPlugin';
+export * from './BubbleSetPlugin';
+export * from './BubbleSetPath';
 
 export default function register(
   cytoscape: (type: 'core' | 'collection' | 'layout', name: string, extension: any) => void
