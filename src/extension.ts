@@ -9,17 +9,20 @@ import {
   Rectangle,
   Circle,
   calculatePotentialOutline,
-  ICenterPoint,
   IRectangle,
   IPoint,
   IPotentialOptions,
   defaultOptions,
+  calculateVirtualEdges,
+  IRoutingOptions,
+  runIdle,
 } from 'bubblesets-js';
 import throttle from 'lodash.throttle';
 
-export interface IPathOptions extends IOutlineOptions, IPotentialOptions, ICanvasStyle {
+export interface IPathOptions extends IOutlineOptions, IPotentialOptions, ICanvasStyle, IRoutingOptions {
   throttle?: number;
   drawPotentialArea?: boolean;
+  virtualEdges?: boolean;
 }
 
 export interface ICanvasStyle {
@@ -35,13 +38,10 @@ export interface IBubbleSetsPluginOptions extends IPathOptions {
 export interface IBubbleSetNodeData {
   area?: Area;
   isCircle: boolean;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  shape: Circle | Rectangle;
 }
 export interface IBubbleSetEdgeData {
-  areas: [];
+  areas: Area[];
   points: IPoint[];
 }
 
@@ -57,11 +57,18 @@ function arrayEquals(a: IPoint[], b: IPoint[]) {
   return a.length === b.length && a.every((ai, i) => ai.x === b[i].x && ai.y === b[i].y);
 }
 
+function createShape(isCircle: boolean, bb: BoundingBox12 & BoundingBoxWH) {
+  return isCircle
+    ? new Circle(bb.x1 + bb.w / 2, bb.y1 + bb.h / 2, Math.max(bb.w, bb.h) / 2)
+    : new Rectangle(bb.x1, bb.y1, bb.w, bb.h);
+}
+
 class BubbleSetPath {
   private path = new PointPath([]);
   private potentialAreaBB: IRectangle = { x: 0, y: 0, width: 0, height: 0 };
   private potentialArea: Area = new Area(4, 0, 0, 0, 0, 0, 0);
   private readonly options: Required<IPathOptions>;
+  private readonly virtualEdgeAreas = new Map<string, Area>();
 
   private readonly throttledUpdate: () => void;
 
@@ -78,6 +85,7 @@ class BubbleSetPath {
         strokeStyle: 'black',
         throttle: 100,
         drawPotentialArea: false,
+        virtualEdges: true,
       },
       defaultOptions,
       options
@@ -118,81 +126,63 @@ class BubbleSetPath {
     this.potentialAreaBB = nextPotentialBB;
     const potentialArea = this.potentialArea;
 
-    const memberCenters: ICenterPoint[] = [];
     const cache = new Map<string, Area>();
+    let updateEdges = false;
+
     if (!potentialAreaDirty) {
       this.nodes.forEach((n) => {
-        const data = n.scratch(SCRATCH_KEY) ?? (null as IBubbleSetNodeData | null);
+        const data = (n.scratch(SCRATCH_KEY) ?? null) as IBubbleSetNodeData | null;
         if (data && data.area) {
-          cache.set(`${data.width}x${data.height}x${data.isCircle}`, data.area);
+          cache.set(`${data.shape.width}x${data.shape.height}x${data.isCircle}`, data.area);
         }
       });
     }
 
-    const updateData = (n: NodeSingular, bb: BoundingBox12 & BoundingBoxWH) => {
-      let data = n.scratch(SCRATCH_KEY) ?? (null as IBubbleSetNodeData | null);
-      const center = {
-        cx: bb.x1 + bb.w / 2,
-        cy: bb.y1 + bb.h / 2,
-      };
+    const updateData = (n: NodeSingular) => {
+      const bb = n.boundingBox({});
+      let data = (n.scratch(SCRATCH_KEY) ?? null) as IBubbleSetNodeData | null;
+      const isCircle = useCircle(n.style('shape'));
       if (
         !data ||
         potentialAreaDirty ||
         !data.area ||
-        data.isCircle !== useCircle(n.style('shape')) ||
-        data.width !== bb.w ||
-        data.height !== bb.h
+        data.isCircle !== isCircle ||
+        data.shape.width !== bb.w ||
+        data.shape.height !== bb.h
       ) {
         // full recreate
+        updateEdges = true;
         data = {
-          isCircle: useCircle(n.style('shape')),
-          x: bb.x1,
-          y: bb.y1,
-          width: bb.w,
-          height: bb.h,
+          isCircle,
+          shape: createShape(isCircle, bb),
         };
-        const key = `${data.width}x${data.height}x${data.isCircle}`;
+        const key = `${data.shape.width}x${data.shape.height}x${data.isCircle}`;
         if (cache.has(key)) {
           data.area = this.potentialArea.copy(cache.get(key)!, {
             x: bb.x1 - this.options.nodeR1,
             y: bb.y1 - this.options.nodeR1,
           });
         } else {
-          data.area = data.isCircle
-            ? createGenericInfluenceArea(
-                new Circle(center.cx, center.cy, Math.max(bb.w, bb.h) / 2),
-                potentialArea,
-                this.options.nodeR1
-              )
-            : createRectangleInfluenceArea(Rectangle.from(data), potentialArea, this.options.nodeR1);
+          data.area = data!.isCircle
+            ? createGenericInfluenceArea(data!.shape, potentialArea, this.options.nodeR1)
+            : createRectangleInfluenceArea(data!.shape, potentialArea, this.options.nodeR1);
         }
         n.scratch(SCRATCH_KEY, data);
-      } else if (data.x !== bb.x1 || data.y !== bb.y1) {
+      } else if (data.shape.x !== bb.x1 || data.shape.y !== bb.y1) {
+        updateEdges = true;
+        data.shape = createShape(isCircle, bb);
         data.area = this.potentialArea.copy(data.area!, {
           x: bb.x1 - this.options.nodeR1,
           y: bb.y1 - this.options.nodeR1,
         });
       }
 
-      return data.area!;
+      return data;
     };
-    const members = this.nodes.map((n) => {
-      const bb = n.boundingBox({});
 
-      const center = {
-        cx: bb.x1 + bb.w / 2,
-        cy: bb.y1 + bb.h / 2,
-      };
+    const members = this.nodes.map(updateData);
 
-      memberCenters.push(center);
-      return updateData(n, bb);
-    });
-
-    const nonMembers = !this.avoidNodes
-      ? []
-      : this.avoidNodes.map((n) => {
-          return updateData(n, n.boundingBox({}));
-        });
+    const nonMembers = !this.avoidNodes ? [] : this.avoidNodes.map(updateData);
 
     const edges: Area[] = [];
     this.edges.forEach((e) => {
@@ -200,7 +190,7 @@ class BubbleSetPath {
       if (ps.length === 0) {
         return;
       }
-      let data = e.scratch(SCRATCH_KEY) ?? (null as IBubbleSetEdgeData | null);
+      let data = (e.scratch(SCRATCH_KEY) ?? null) as IBubbleSetEdgeData | null;
       if (!data || potentialAreaDirty || !arrayEquals(data.points, ps)) {
         data = {
           points: ps,
@@ -214,7 +204,7 @@ class BubbleSetPath {
                 y2: next.y,
               },
               potentialArea,
-              20
+              this.options.edgeR1
             );
           }),
         };
@@ -223,12 +213,37 @@ class BubbleSetPath {
       edges.push(...data.areas);
     });
 
-    const path = calculatePotentialOutline(
+    const memberShapes = members.map((d) => d.shape);
+    if (this.options.virtualEdges) {
+      if (updateEdges) {
+        const nonMembersShapes = nonMembers.map((d) => d.shape);
+        const lines = calculateVirtualEdges(
+          memberShapes,
+          nonMembersShapes,
+          this.options.maxRoutingIterations,
+          this.options.morphBuffer
+        );
+        const bak = new Map(this.virtualEdgeAreas);
+        this.virtualEdgeAreas.clear();
+        lines.forEach((line) => {
+          const key = `${line.x1}x${line.y1}x${line.x2}x${line.y2}`;
+          const area = bak.get(key) ?? createLineInfluenceArea(line, potentialArea, this.options.edgeR1);
+          this.virtualEdgeAreas.set(key, area);
+          edges.push(area);
+        });
+      } else {
+        this.virtualEdgeAreas.forEach((area) => edges.push(area));
+      }
+    }
+
+    const memberAreas = members.map((d) => d.area!);
+    const nonMemberAreas = nonMembers.map((d) => d.area!));
+    let path = calculatePotentialOutline(
       potentialArea,
-      members,
+      memberAreas,
       edges,
-      nonMembers,
-      (p) => p.containsElements(memberCenters),
+      nonMemberAreas,
+      (p) => p.containsElements(memberShapes),
       this.options
     );
 
