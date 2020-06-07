@@ -1,4 +1,12 @@
-import { Core, NodeCollection, EdgeCollection, NodeSingular, BoundingBoxWH, BoundingBox12 } from 'cytoscape';
+import {
+  Core,
+  NodeCollection,
+  EdgeCollection,
+  NodeSingular,
+  BoundingBoxWH,
+  BoundingBox12,
+  EdgeSingular,
+} from 'cytoscape';
 import {
   IOutlineOptions,
   PointPath,
@@ -22,6 +30,12 @@ import throttle from 'lodash.throttle';
 export interface IPathOptions extends IOutlineOptions, IPotentialOptions, ICanvasStyle, IRoutingOptions {
   throttle?: number;
   drawPotentialArea?: boolean;
+
+  includeLabels?: boolean;
+  includeMainLabels?: boolean;
+  includeOverlays?: boolean;
+  includeSourceLabels?: boolean;
+  includeTargetLabels?: boolean;
 }
 
 export interface ICanvasStyle {
@@ -44,6 +58,10 @@ export interface IBubbleSetEdgeData {
   areas: Area[];
 }
 
+function round2(v: number) {
+  return Math.round(v * 100) / 100;
+}
+
 const SCRATCH_KEY = 'bubbleSets';
 const circularBase = ['ellipse', 'diamond', 'diamond', 'pentagon', 'diamond', 'hexagon', 'heptagon', 'octagon', 'star'];
 const circular = new Set(circularBase.concat(circularBase.map((v) => `round-${v}`)));
@@ -53,10 +71,10 @@ function useCircle(shape: string) {
 }
 
 function toNodeKey(data: IBubbleSetNodeData) {
-  return `${data.shape.width}x${data.shape.height}x${data.isCircle}`;
+  return `${round2(data.shape.width)}x${round2(data.shape.height)}x${data.isCircle}`;
 }
 function toEdgeKey(line: ILine) {
-  return `${line.x1}x${line.y1}x${line.x2}x${line.y2}`;
+  return `${round2(line.x1)}x${round2(line.y1)}x${round2(line.x2)}x${round2(line.y2)}`;
 }
 
 function linesEquals(a: ILine[], b: ILine[]) {
@@ -71,7 +89,7 @@ function createShape(isCircle: boolean, bb: BoundingBox12 & BoundingBoxWH) {
 
 class BubbleSetPath {
   private path = new PointPath([]);
-  private potentialAreaBB: IRectangle = { x: 0, y: 0, width: 0, height: 0 };
+  private activeArea: IRectangle = { x: 0, y: 0, width: 0, height: 0 };
   private potentialArea: Area = new Area(4, 0, 0, 0, 0, 0, 0);
   private readonly options: Required<IPathOptions>;
   private readonly virtualEdgeAreas = new Map<string, Area>();
@@ -81,7 +99,7 @@ class BubbleSetPath {
   constructor(
     private readonly plugin: BubbleSetsPlugin,
     public readonly nodes: NodeCollection,
-    public readonly edges: EdgeCollection,
+    public readonly edges: EdgeCollection | null,
     public readonly avoidNodes: NodeCollection | null,
     options: IPathOptions = {}
   ) {
@@ -95,6 +113,13 @@ class BubbleSetPath {
         drawPotentialArea: false,
         virtualEdges: false,
       },
+      {
+        includeLabels: false,
+        includeMainLabels: false,
+        includeOverlays: false,
+        includeSourceLabels: false,
+        includeTargetLabels: false,
+      },
       options
     );
 
@@ -107,11 +132,13 @@ class BubbleSetPath {
     if (avoidNodes) {
       avoidNodes.on('add position remove', this.throttledUpdate);
     }
-    edges.on('add move position position', this.throttledUpdate);
+    if (edges) {
+      edges.on('add move position position', this.throttledUpdate);
+    }
   }
 
   update = () => {
-    const bb = this.nodes.union(this.edges).boundingBox({});
+    const bb = this.nodes.union(this.edges ?? []).boundingBox(this.options);
     let potentialAreaDirty = false;
     const padding = Math.max(this.options.edgeR1, this.options.nodeR1) + this.options.morphBuffer;
     const nextPotentialBB: IRectangle = {
@@ -120,17 +147,14 @@ class BubbleSetPath {
       width: bb.w + padding * 2,
       height: bb.h + padding * 2,
     };
-    if (this.potentialAreaBB.x !== nextPotentialBB.x || this.potentialAreaBB.y !== nextPotentialBB.y) {
+    if (this.activeArea.x !== nextPotentialBB.x || this.activeArea.y !== nextPotentialBB.y) {
       potentialAreaDirty = true;
       this.potentialArea = Area.fromPixelRegion(nextPotentialBB, this.options.pixelGroup);
-    } else if (
-      this.potentialAreaBB.width !== nextPotentialBB.width ||
-      this.potentialAreaBB.height !== nextPotentialBB.height
-    ) {
+    } else if (this.activeArea.width !== nextPotentialBB.width || this.activeArea.height !== nextPotentialBB.height) {
       // but not dirty
       this.potentialArea = Area.fromPixelRegion(nextPotentialBB, this.options.pixelGroup);
     }
-    this.potentialAreaBB = nextPotentialBB;
+    this.activeArea = nextPotentialBB;
     const potentialArea = this.potentialArea;
 
     const cache = new Map<string, Area>();
@@ -146,7 +170,7 @@ class BubbleSetPath {
 
     let updateEdges = false;
     const updateNodeData = (n: NodeSingular) => {
-      const bb = n.boundingBox({});
+      const bb = n.boundingBox(this.options);
       let data = (n.scratch(SCRATCH_KEY) ?? null) as IBubbleSetNodeData | null;
       const isCircle = useCircle(n.style('shape'));
       if (
@@ -195,7 +219,7 @@ class BubbleSetPath {
 
     if (!potentialAreaDirty) {
       this.virtualEdgeAreas.forEach((value, key) => edgeCache.set(key, value));
-      this.edges.forEach((n) => {
+      (this.edges ?? []).forEach((n: EdgeSingular) => {
         const data = (n.scratch(SCRATCH_KEY) ?? null) as IBubbleSetEdgeData | null;
         if (data && data.lines) {
           data.lines.forEach((line, i) => {
@@ -218,7 +242,7 @@ class BubbleSetPath {
     };
     const edges: Area[] = [];
 
-    this.edges.forEach((e) => {
+    (this.edges ?? []).forEach((e: EdgeSingular) => {
       const ps = (e.segmentPoints() ?? [e.sourceEndpoint(), e.targetEndpoint()]).map((d) => Object.assign({}, d));
       if (ps.length === 0) {
         return;
@@ -304,13 +328,15 @@ class BubbleSetPath {
         d.scratch(SCRATCH_KEY, {});
       });
     }
-    this.edges.off('add move position position', undefined, this.throttledUpdate);
     this.nodes.forEach((d) => {
       d.scratch(SCRATCH_KEY, {});
     });
-    this.edges.forEach((d) => {
-      d.scratch(SCRATCH_KEY, {});
-    });
+    if (this.edges) {
+      this.edges.off('add move position position', undefined, this.throttledUpdate);
+      this.edges.forEach((d) => {
+        d.scratch(SCRATCH_KEY, {});
+      });
+    }
     this.plugin.removePath(this);
   }
 }
@@ -359,7 +385,12 @@ class BubbleSetsPlugin {
     });
   }
 
-  addPath(nodes: NodeCollection, edges: EdgeCollection, avoidNodes: NodeCollection | null, options: IPathOptions = {}) {
+  addPath(
+    nodes: NodeCollection,
+    edges: EdgeCollection | null,
+    avoidNodes: NodeCollection | null,
+    options: IPathOptions = {}
+  ) {
     const path = new BubbleSetPath(this, nodes, edges, avoidNodes, Object.assign({}, this.options, options));
     this.paths.push(path);
     return path;
