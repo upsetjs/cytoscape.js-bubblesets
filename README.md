@@ -1,6 +1,6 @@
 # Cytoscape.js BubbleSets Plugin
 
-[![NPM Package][npm-image]][npm-url] [![Github Actions][github-actions-image]][github-actions-url]
+[![NPM Package][npm-image]][npm-url] [![Github Actions][github-actions-image]][github-actions-url] [![Cytoscape Plugin][cytoscape-image]][cytoscape-url]
 
 A [Cytoscape.js](https://js.cytoscape.org) plugin for rendering [Bubblesets](https://github.com/sgratzl/bubblesets-js).
 
@@ -82,4 +82,6 @@ yarn release:pre
 [npm-url]: https://npmjs.org/package/sgratzl/cytoscape-bubblesets
 [github-actions-image]: https://github.com/sgratzl/cytoscape.js-bubblesets/workflows/ci/badge.svg
 [github-actions-url]: https://github.com/sgratzl/cytoscape.js-bubblesets/actions
+[cytoscape-image]: https://img.shields.io/badge/Cytoscape-plugin-yellow
+[cytoscape-url]: https://js.cytoscape.org/#extensions/ui-extensions
 [codepen]: https://img.shields.io/badge/CodePen-open-blue?logo=codepen
