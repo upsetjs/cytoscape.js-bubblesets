@@ -19,9 +19,9 @@ export default class BubbleSetsPlugin {
 
     const canvas = (this.canvas = (container?.ownerDocument ?? document).createElement('canvas'));
     if (container) {
-      container.appendChild(canvas);
+      container.insertAdjacentElement('afterbegin', canvas);
     }
-    canvas.style.zIndex = (options.zIndex ?? 1).toString();
+    canvas.style.zIndex = (options.zIndex ?? 0).toString();
     canvas.style.position = 'absolute';
     canvas.style.left = '0';
     canvas.style.top = '0';
