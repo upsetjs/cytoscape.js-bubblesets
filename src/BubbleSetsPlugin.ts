@@ -11,10 +11,25 @@ export interface IBubbleSetsPluginOptions extends IBubbleSetPathOptions {
 
 export default class BubbleSetsPlugin {
   readonly canvas: HTMLCanvasElement;
-  private readonly pixelRatio: number;
-  private readonly paths: BubbleSetPath[] = [];
+  readonly #pixelRatio: number;
+  readonly #paths: BubbleSetPath[] = [];
+  readonly #adapter = {
+    draw: () => this.draw(),
+    remove: (path: BubbleSetPath) => {
+      const index = this.#paths.indexOf(path);
+      if (index < 0) {
+        return false;
+      }
+      this.#paths.splice(index, 1);
+      return true;
+    },
+  };
+  readonly #cy: cy.Core;
+  readonly #options: IBubbleSetsPluginOptions;
 
-  constructor(private readonly cy: cy.Core, private readonly options: IBubbleSetsPluginOptions = {}) {
+  constructor(cy: cy.Core, options: IBubbleSetsPluginOptions = {}) {
+    this.#cy = cy;
+    this.#options = options;
     const container = cy.container();
 
     const canvas = (this.canvas = (container?.ownerDocument ?? document).createElement('canvas'));
@@ -29,7 +44,7 @@ export default class BubbleSetsPlugin {
     canvas.style.outlineStyle = 'none';
 
     const oPixelRatio = options.pixelRatio ?? 'auto';
-    this.pixelRatio = oPixelRatio === 'auto' ? window.devicePixelRatio : oPixelRatio;
+    this.#pixelRatio = oPixelRatio === 'auto' ? window.devicePixelRatio : oPixelRatio;
 
     cy.on('render', () => {
       this.draw();
@@ -41,8 +56,8 @@ export default class BubbleSetsPlugin {
       }, 200)
     );
     const resize = () => {
-      canvas.width = cy.width() * this.pixelRatio;
-      canvas.height = cy.height() * this.pixelRatio;
+      canvas.width = cy.width() * this.#pixelRatio;
+      canvas.height = cy.height() * this.#pixelRatio;
 
       canvas.style.width = `${canvas.width}px`;
       canvas.style.height = `${canvas.height}px`;
@@ -58,20 +73,19 @@ export default class BubbleSetsPlugin {
     avoidNodes: cy.NodeCollection | null,
     options: IBubbleSetPathOptions = {}
   ) {
-    const path = new BubbleSetPath(this, nodes, edges, avoidNodes, Object.assign({}, this.options, options));
-    this.paths.push(path);
+    const path = new BubbleSetPath(this.#adapter, nodes, edges, avoidNodes, Object.assign({}, this.#options, options));
+    this.#paths.push(path);
     path.update();
     this.draw();
     return path;
   }
 
   removePath(path: BubbleSetPath) {
-    const i = this.paths.indexOf(path);
+    const i = this.#paths.indexOf(path);
     if (i < 0) {
       return false;
     }
-    this.paths.splice(i, 1);
-    return true;
+    return path.remove();
   }
 
   get ctx() {
@@ -87,21 +101,21 @@ export default class BubbleSetsPlugin {
   }
 
   update() {
-    this.paths.forEach((p) => p.update());
+    this.#paths.forEach((p) => p.update());
     this.draw();
   }
 
   draw() {
     this.clear();
-    const pan = this.cy.pan();
-    const zoom = this.cy.zoom();
+    const pan = this.#cy.pan();
+    const zoom = this.#cy.zoom();
     const ctx = this.ctx;
     ctx.save();
     ctx.resetTransform();
-    ctx.translate(pan.x * this.pixelRatio, pan.y * this.pixelRatio);
-    ctx.scale(zoom * this.pixelRatio, zoom * this.pixelRatio);
+    ctx.translate(pan.x * this.#pixelRatio, pan.y * this.#pixelRatio);
+    ctx.scale(zoom * this.#pixelRatio, zoom * this.#pixelRatio);
 
-    this.paths.forEach((p) => p.draw(ctx));
+    this.#paths.forEach((p) => p.draw(ctx));
 
     ctx.restore();
   }
