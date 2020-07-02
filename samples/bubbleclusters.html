@@ -89,8 +89,9 @@
       });
       cy.ready(() => {
         const bb = cy.bubbleSets({
-          zIndex: 0,
+          zIndex: 4,
           throttle: 10,
+          interactive: true,
         });
         cy.nodes().forEach((node) => {
           const path = bb.addPath(node, null, null, bbStyle);

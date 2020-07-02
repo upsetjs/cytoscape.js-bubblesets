@@ -20,7 +20,7 @@ import throttle from 'lodash.throttle';
 
 export interface IBubbleSetPathOptions extends IOutlineOptions, IPotentialOptions, ISVGPathStyle, IRoutingOptions {
   throttle?: number;
-  drawPotentialArea?: boolean;
+  interactive?: boolean;
 
   includeLabels?: boolean;
   includeMainLabels?: boolean;
@@ -104,8 +104,8 @@ export default class BubbleSetPath {
         },
         className: '',
         throttle: 100,
-        drawPotentialArea: false,
         virtualEdges: false,
+        interactive: false,
       },
       {
         includeLabels: false,
@@ -120,6 +120,12 @@ export default class BubbleSetPath {
     Object.assign(this.node.style, this.#options.style);
     if (this.#options.className) {
       this.node.classList.add(this.#options.className);
+    }
+
+    if (this.#options.interactive) {
+      this.node.addEventListener('dblclick', () => {
+        this.nodes.select();
+      });
     }
 
     this.#throttledUpdate = throttle(() => {
