@@ -1,7 +1,6 @@
 import cy from 'cytoscape';
 import {
   IOutlineOptions,
-  PointPath,
   Area,
   createLineInfluenceArea,
   createGenericInfluenceArea,
@@ -19,7 +18,7 @@ import {
 } from 'bubblesets-js';
 import throttle from 'lodash.throttle';
 
-export interface IBubbleSetPathOptions extends IOutlineOptions, IPotentialOptions, ICanvasStyle, IRoutingOptions {
+export interface IBubbleSetPathOptions extends IOutlineOptions, IPotentialOptions, ISVGPathStyle, IRoutingOptions {
   throttle?: number;
   drawPotentialArea?: boolean;
 
@@ -30,9 +29,9 @@ export interface IBubbleSetPathOptions extends IOutlineOptions, IPotentialOption
   includeTargetLabels?: boolean;
 }
 
-export interface ICanvasStyle {
-  fillStyle?: string | CanvasGradient | CanvasPattern;
-  strokeStyle?: string | CanvasGradient | CanvasPattern;
+export interface ISVGPathStyle {
+  style?: CSSStyleDeclaration;
+  className?: string;
 }
 
 interface IBubbleSetNodeData {
@@ -75,7 +74,6 @@ function createShape(isCircle: boolean, bb: cy.BoundingBox12 & cy.BoundingBoxWH)
 }
 
 export default class BubbleSetPath {
-  #path = new PointPath([]);
   #activeArea: IRectangle = { x: 0, y: 0, width: 0, height: 0 };
   #potentialArea: Area = new Area(4, 0, 0, 0, 0, 0, 0);
   readonly #options: Required<IBubbleSetPathOptions>;
@@ -84,13 +82,14 @@ export default class BubbleSetPath {
   readonly #throttledUpdate: () => void;
   readonly #adder: (e: cy.EventObject) => void;
   readonly #remover: (e: cy.EventObject) => void;
-  readonly #adapter: { draw(): void; remove(path: BubbleSetPath): boolean };
+  readonly #adapter: { remove(path: BubbleSetPath): boolean };
 
   constructor(
-    adapter: { draw(): void; remove(path: BubbleSetPath): boolean },
+    adapter: { remove(path: BubbleSetPath): boolean },
+    public readonly node: SVGPathElement,
     public readonly nodes: cy.NodeCollection,
-    public readonly edges: cy.EdgeCollection | null,
-    public readonly avoidNodes: cy.NodeCollection | null,
+    public readonly edges: cy.EdgeCollection,
+    public readonly avoidNodes: cy.NodeCollection,
     options: IBubbleSetPathOptions = {}
   ) {
     this.#adapter = adapter;
@@ -98,8 +97,12 @@ export default class BubbleSetPath {
       {},
       defaultOptions,
       {
-        fillStyle: 'rgba(0,0,0,0.25)',
-        strokeStyle: 'black',
+        style: {
+          stroke: 'black',
+          fill: 'black',
+          fillOpacity: 0.25,
+        },
+        className: '',
         throttle: 100,
         drawPotentialArea: false,
         virtualEdges: false,
@@ -114,9 +117,13 @@ export default class BubbleSetPath {
       options
     );
 
+    Object.assign(this.node.style, this.#options.style);
+    if (this.#options.className) {
+      this.node.classList.add(this.#options.className);
+    }
+
     this.#throttledUpdate = throttle(() => {
       this.update();
-      this.#adapter.draw();
     }, this.#options.throttle);
     this.#adder = (e) => {
       e.target.on('add', this.#adder);
@@ -132,20 +139,16 @@ export default class BubbleSetPath {
     nodes.on('position', this.#throttledUpdate);
     nodes.on('add', this.#adder);
     nodes.on('remove', this.#remover);
-    if (avoidNodes) {
-      avoidNodes.on('position', this.#throttledUpdate);
-      avoidNodes.on('add', this.#adder);
-      avoidNodes.on('remove', this.#remover);
-    }
-    if (edges) {
-      edges.on('move position', this.#throttledUpdate);
-      edges.on('add', this.#adder);
-      edges.on('remove', this.#remover);
-    }
+    avoidNodes.on('position', this.#throttledUpdate);
+    avoidNodes.on('add', this.#adder);
+    avoidNodes.on('remove', this.#remover);
+    edges.on('move position', this.#throttledUpdate);
+    edges.on('add', this.#adder);
+    edges.on('remove', this.#remover);
   }
 
   update = () => {
-    const bb = this.nodes.union(this.edges ?? []).boundingBox(this.#options);
+    const bb = this.nodes.union(this.edges).boundingBox(this.#options);
     let potentialAreaDirty = false;
     const padding = Math.max(this.#options.edgeR1, this.#options.nodeR1) + this.#options.morphBuffer;
     const nextPotentialBB: IRectangle = {
@@ -220,13 +223,13 @@ export default class BubbleSetPath {
     };
 
     const members = this.nodes.map(updateNodeData);
-    const nonMembers = !this.avoidNodes ? [] : this.avoidNodes.map(updateNodeData);
+    const nonMembers = this.avoidNodes.map(updateNodeData);
 
     const edgeCache = new Map<string, Area>();
 
     if (!potentialAreaDirty) {
       this.#virtualEdgeAreas.forEach((value, key) => edgeCache.set(key, value));
-      (this.edges ?? []).forEach((n: cy.EdgeSingular) => {
+      this.edges.forEach((n: cy.EdgeSingular) => {
         const data = (n.scratch(SCRATCH_KEY) ?? null) as IBubbleSetEdgeData | null;
         if (data && data.lines) {
           data.lines.forEach((line, i) => {
@@ -249,7 +252,7 @@ export default class BubbleSetPath {
     };
     const edges: Area[] = [];
 
-    (this.edges ?? []).forEach((e: cy.EdgeSingular) => {
+    this.edges.forEach((e: cy.EdgeSingular) => {
       const ps = (e.segmentPoints() ?? [e.sourceEndpoint(), e.targetEndpoint()]).map((d) => Object.assign({}, d));
       if (ps.length === 0) {
         return;
@@ -307,49 +310,30 @@ export default class BubbleSetPath {
       this.#options
     );
 
-    this.#path = path.sample(8).simplify(0).bSplines().simplify(0);
+    this.node.setAttribute('d', path.sample(8).simplify(0).bSplines().simplify(0).toString());
   };
-
-  draw(ctx: CanvasRenderingContext2D) {
-    ctx.save();
-    if (this.#options.drawPotentialArea) {
-      this.#potentialArea.draw(ctx, true);
-    }
-    this.#path.draw(ctx);
-    if (this.#options.strokeStyle) {
-      ctx.strokeStyle = this.#options.strokeStyle;
-      ctx.stroke();
-    }
-    if (this.#options.fillStyle) {
-      ctx.fillStyle = this.#options.fillStyle;
-      ctx.fill();
-    }
-    ctx.restore();
-  }
 
   remove() {
     this.nodes.off('position', undefined, this.#throttledUpdate);
     this.nodes.off('add', undefined, this.#adder);
     this.nodes.off('remove', undefined, this.#remover);
-    if (this.avoidNodes) {
-      this.avoidNodes.off('position', undefined, this.#throttledUpdate);
-      this.avoidNodes.off('add', undefined, this.#adder);
-      this.avoidNodes.off('remove', undefined, this.#remover);
-      this.avoidNodes.forEach((d) => {
-        d.scratch(SCRATCH_KEY, {});
-      });
-    }
+    this.avoidNodes.off('position', undefined, this.#throttledUpdate);
+    this.avoidNodes.off('add', undefined, this.#adder);
+    this.avoidNodes.off('remove', undefined, this.#remover);
+    this.avoidNodes.forEach((d) => {
+      d.scratch(SCRATCH_KEY, {});
+    });
     this.nodes.forEach((d) => {
       d.scratch(SCRATCH_KEY, {});
     });
-    if (this.edges) {
-      this.edges.off('move position', undefined, this.#throttledUpdate);
-      this.edges.off('add', undefined, this.#adder);
-      this.edges.off('remove', undefined, this.#remover);
-      this.edges.forEach((d) => {
-        d.scratch(SCRATCH_KEY, {});
-      });
-    }
+
+    this.edges.off('move position', undefined, this.#throttledUpdate);
+    this.edges.off('add', undefined, this.#adder);
+    this.edges.off('remove', undefined, this.#remover);
+    this.edges.forEach((d) => {
+      d.scratch(SCRATCH_KEY, {});
+    });
+    this.node.remove();
     return this.#adapter.remove(this);
   }
 }

@@ -4,17 +4,16 @@ import BubbleSetPath, { IBubbleSetPathOptions } from './BubbleSetPath';
 
 export interface IBubbleSetsPluginOptions extends IBubbleSetPathOptions {
   zIndex?: number;
-  pixelRatio?: 'auto' | number;
 }
+
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 // canvas ideas based on https://github.com/classcraft/cytoscape.js-canvas
 
 export default class BubbleSetsPlugin {
-  readonly canvas: HTMLCanvasElement;
-  readonly #pixelRatio: number;
+  readonly svg: SVGSVGElement;
   readonly #paths: BubbleSetPath[] = [];
   readonly #adapter = {
-    draw: () => this.draw(),
     remove: (path: BubbleSetPath) => {
       const index = this.#paths.indexOf(path);
       if (index < 0) {
@@ -32,36 +31,27 @@ export default class BubbleSetsPlugin {
     this.#options = options;
     const container = cy.container();
 
-    const canvas = (this.canvas = (container?.ownerDocument ?? document).createElement('canvas'));
+    const svg = (this.svg = (container?.ownerDocument ?? document).createElementNS(SVG_NAMESPACE, 'svg'));
     if (container) {
-      container.insertAdjacentElement('afterbegin', canvas);
+      container.insertAdjacentElement('afterbegin', svg);
     }
-    canvas.style.zIndex = (options.zIndex ?? 0).toString();
-    canvas.style.position = 'absolute';
-    canvas.style.left = '0';
-    canvas.style.top = '0';
-    canvas.style.userSelect = 'none';
-    canvas.style.outlineStyle = 'none';
+    svg.style.zIndex = (options.zIndex ?? 0).toString();
+    svg.style.position = 'absolute';
+    svg.style.left = '0';
+    svg.style.top = '0';
+    svg.style.userSelect = 'none';
+    svg.style.outlineStyle = 'none';
 
-    const oPixelRatio = options.pixelRatio ?? 'auto';
-    this.#pixelRatio = oPixelRatio === 'auto' ? window.devicePixelRatio : oPixelRatio;
-
-    cy.on('render', () => {
-      this.draw();
-    });
+    svg.appendChild(svg.ownerDocument.createElementNS(SVG_NAMESPACE, 'g'));
     cy.on(
-      'layoutstop move',
+      'zoom pan',
       throttle(() => {
-        this.update();
-      }, 200)
+        this.zoomed();
+      }, options.throttle ?? 100)
     );
     const resize = () => {
-      canvas.width = cy.width() * this.#pixelRatio;
-      canvas.height = cy.height() * this.#pixelRatio;
-
-      canvas.style.width = `${canvas.width}px`;
-      canvas.style.height = `${canvas.height}px`;
-      this.draw();
+      svg.style.width = `${cy.width()}px`;
+      svg.style.height = `${cy.height()}px`;
     };
     cy.on('resize', resize);
     resize();
@@ -73,11 +63,23 @@ export default class BubbleSetsPlugin {
     avoidNodes: cy.NodeCollection | null,
     options: IBubbleSetPathOptions = {}
   ) {
-    const path = new BubbleSetPath(this.#adapter, nodes, edges, avoidNodes, Object.assign({}, this.#options, options));
+    const node = this.svg.ownerDocument.createElementNS(SVG_NAMESPACE, 'path');
+    this.svg.firstElementChild!.appendChild(node);
+    const path = new BubbleSetPath(
+      this.#adapter,
+      node,
+      nodes,
+      edges ?? this.#cy.collection(),
+      avoidNodes ?? this.#cy.collection(),
+      Object.assign({}, this.#options, options)
+    );
     this.#paths.push(path);
     path.update();
-    this.draw();
     return path;
+  }
+
+  getPaths() {
+    return this.#paths.slice();
   }
 
   removePath(path: BubbleSetPath) {
@@ -88,36 +90,16 @@ export default class BubbleSetsPlugin {
     return path.remove();
   }
 
-  get ctx() {
-    return this.canvas.getContext('2d')!;
-  }
-
-  clear() {
-    const ctx = this.ctx;
-    ctx.save();
-    ctx.resetTransform();
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.restore();
+  private zoomed() {
+    const pan = this.#cy.pan();
+    const zoom = this.#cy.zoom();
+    const g = this.svg.firstElementChild! as SVGGElement;
+    g.setAttribute('transform', `translate(${pan.x},${pan.y})scale(${zoom})`);
   }
 
   update() {
+    this.zoomed();
     this.#paths.forEach((p) => p.update());
-    this.draw();
-  }
-
-  draw() {
-    this.clear();
-    const pan = this.#cy.pan();
-    const zoom = this.#cy.zoom();
-    const ctx = this.ctx;
-    ctx.save();
-    ctx.resetTransform();
-    ctx.translate(pan.x * this.#pixelRatio, pan.y * this.#pixelRatio);
-    ctx.scale(zoom * this.#pixelRatio, zoom * this.#pixelRatio);
-
-    this.#paths.forEach((p) => p.draw(ctx));
-
-    ctx.restore();
   }
 }
 
