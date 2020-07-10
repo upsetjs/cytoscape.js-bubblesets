@@ -10,11 +10,15 @@ export default function register(
   cytoscape('core', 'bubbleSets', bubbleSets);
 }
 
+// auto register
 if (typeof (window as any).cytoscape !== 'undefined') {
   register((window as any).cytoscape);
 }
 
-declare namespace cytoscape {
+export declare namespace cytoscape {
+  type Ext2 = (cytoscape: (type: 'core' | 'collection' | 'layout', name: string, extension: any) => void) => void;
+  function use(module: Ext2): void;
+
   interface Core {
     bubbleSets: typeof bubbleSets;
   }
