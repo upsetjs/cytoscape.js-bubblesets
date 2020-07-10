@@ -8,8 +8,6 @@ export interface IBubbleSetsPluginOptions extends IBubbleSetPathOptions {
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-// canvas ideas based on https://github.com/classcraft/cytoscape.js-canvas
-
 export default class BubbleSetsPlugin {
   readonly svg: SVGSVGElement;
   readonly #paths: BubbleSetPath[] = [];
@@ -25,6 +23,7 @@ export default class BubbleSetsPlugin {
   };
   readonly #cy: cy.Core;
   readonly #options: IBubbleSetsPluginOptions;
+  private readonly throttledZoom: () => void;
 
   constructor(cy: cy.Core, options: IBubbleSetsPluginOptions = {}) {
     this.#cy = cy;
@@ -43,24 +42,33 @@ export default class BubbleSetsPlugin {
     svg.style.outlineStyle = 'none';
 
     svg.appendChild(svg.ownerDocument.createElementNS(SVG_NAMESPACE, 'g'));
-    cy.on(
-      'zoom pan',
-      throttle(() => {
-        this.zoomed();
-      }, options.throttle ?? 100)
-    );
-    const resize = () => {
-      svg.style.width = `${cy.width()}px`;
-      svg.style.height = `${cy.height()}px`;
-    };
-    cy.on('resize', resize);
-    resize();
+    this.throttledZoom = throttle(() => {
+      this.zoomed();
+    }, options.throttle ?? 100);
+
+    cy.on('viewport', this.throttledZoom);
+    cy.on('resize', this.resize);
+    this.resize();
+  }
+
+  private readonly resize = () => {
+    this.svg.style.width = `${this.#cy.width()}px`;
+    this.svg.style.height = `${this.#cy.height()}px`;
+  };
+
+  destroy() {
+    for (const path of this.#paths) {
+      path.remove();
+    }
+    this.#cy.off('viewport', undefined, this.throttledZoom);
+    this.#cy.off('resize', undefined, this.resize);
+    this.svg.remove();
   }
 
   addPath(
     nodes: cy.NodeCollection,
-    edges: cy.EdgeCollection | null,
-    avoidNodes: cy.NodeCollection | null,
+    edges: cy.EdgeCollection | null = this.#cy.collection(),
+    avoidNodes: cy.NodeCollection | null = this.#cy.collection(),
     options: IBubbleSetPathOptions = {}
   ) {
     const node = this.svg.ownerDocument.createElementNS(SVG_NAMESPACE, 'path');
