@@ -1,5 +1,4 @@
 import cy from 'cytoscape';
-import throttle from 'lodash.throttle';
 import BubbleSetPath, { IBubbleSetPathOptions } from './BubbleSetPath';
 
 export interface IBubbleSetsPluginOptions extends IBubbleSetPathOptions {
@@ -23,7 +22,6 @@ export default class BubbleSetsPlugin {
   };
   readonly #cy: cy.Core;
   readonly #options: IBubbleSetsPluginOptions;
-  private readonly throttledZoom: () => void;
 
   constructor(cy: cy.Core, options: IBubbleSetsPluginOptions = {}) {
     this.#cy = cy;
@@ -42,11 +40,7 @@ export default class BubbleSetsPlugin {
     svg.style.outlineStyle = 'none';
 
     svg.appendChild(svg.ownerDocument.createElementNS(SVG_NAMESPACE, 'g'));
-    this.throttledZoom = throttle(() => {
-      this.zoomed();
-    }, options.throttle ?? 100);
-
-    cy.on('viewport', this.throttledZoom);
+    cy.on('viewport', this.zoomed);
     cy.on('resize', this.resize);
     this.resize();
   }
@@ -60,7 +54,7 @@ export default class BubbleSetsPlugin {
     for (const path of this.#paths) {
       path.remove();
     }
-    this.#cy.off('viewport', undefined, this.throttledZoom);
+    this.#cy.off('viewport', undefined, this.zoomed);
     this.#cy.off('resize', undefined, this.resize);
     this.svg.remove();
   }
@@ -82,6 +76,9 @@ export default class BubbleSetsPlugin {
       Object.assign({}, this.#options, options)
     );
     this.#paths.push(path);
+    if (this.#paths.length === 1) {
+      this.zoomed();
+    }
     path.update();
     return path;
   }
@@ -98,12 +95,12 @@ export default class BubbleSetsPlugin {
     return path.remove();
   }
 
-  private zoomed() {
+  private readonly zoomed = () => {
     const pan = this.#cy.pan();
     const zoom = this.#cy.zoom();
     const g = this.svg.firstElementChild! as SVGGElement;
     g.setAttribute('transform', `translate(${pan.x},${pan.y})scale(${zoom})`);
-  }
+  };
 
   update() {
     this.zoomed();
