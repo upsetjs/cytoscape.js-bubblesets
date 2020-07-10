@@ -31,7 +31,7 @@
   "include": ["src/**/*.ts", "src/**/*.tsx"],
 
   "typedocOptions": {
-    "name": "UpSet.js Model",
+    "name": "Cytoscape BubbleSets",
     "out": "./docs",
     "mode": "library",
     "theme": "minimal",
