@@ -45,6 +45,34 @@ cy.ready(() => {
 
 ![image](https://user-images.githubusercontent.com/4129778/83965802-8cebcf80-a8b6-11ea-9481-1744521fe8a1.png)
 
+Alternative without registration
+
+```js
+import cytoscape from 'cytoscape';
+import { BubbleSetsPlugin } from 'cytoscape-bubblesets';
+
+const cy = cytoscape({
+  container: document.getElementById('app'),
+  elements: [
+    { data: { id: 'a' } },
+    { data: { id: 'b' } },
+    {
+      data: {
+        id: 'ab',
+        source: 'a',
+        target: 'b',
+      },
+    },
+  ],
+});
+cy.ready(() => {
+  const bb = new BubbleSetsPlugin(cy);
+  bb.addPath(cy.nodes(), cy.edges(), null);
+});
+```
+
+````
+
 ## API
 
 - `addPath(nodes: NodeCollection, edges: EdgeCollection | null, avoidNodes: NodeCollection | null, options?: IBubbleSetPathOptions): BubbleSetPath`
@@ -63,7 +91,7 @@ yarn set version 2
 cat .yarnrc_patch.yml >> .yarnrc.yml
 yarn
 yarn pnpify --sdk
-```
+````
 
 ### Common commands
 
