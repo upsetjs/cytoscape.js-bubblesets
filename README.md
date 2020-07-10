@@ -71,11 +71,9 @@ cy.ready(() => {
 });
 ```
 
-````
-
 ## API
 
-- `addPath(nodes: NodeCollection, edges: EdgeCollection | null, avoidNodes: NodeCollection | null, options?: IBubbleSetPathOptions): BubbleSetPath`
+- `addPath(nodes: NodeCollection, edges?: EdgeCollection | null, avoidNodes?: NodeCollection | null, options?: IBubbleSetPathOptions): BubbleSetPath`
 
   creates a new `BubbleSetPath` instance. The `nodes` is a node collection that should be linked. `edges` an edge collection to include edges. `avoidNodes` is an optional node collection of nodes that should be avoided when generating the outline and any virtual edge between the nodes.
 
@@ -83,15 +81,19 @@ cy.ready(() => {
 
   removes a path again
 
+- `getPaths(): readonly BubbleSetPath[]`
+
+  returns the list of active paths
+
 ## Development Environment
 
 ```sh
 npm i -g yarn
-yarn set version 2
+yarn set version latest
 cat .yarnrc_patch.yml >> .yarnrc.yml
 yarn
-yarn pnpify --sdk
-````
+yarn pnpify --sdk vscode
+```
 
 ### Common commands
 
