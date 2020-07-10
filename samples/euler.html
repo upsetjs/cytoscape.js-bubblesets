@@ -65,15 +65,19 @@
         const atp = cy.nodes().filter(`[sbgnlabel = 'ATP']`);
         bb.addPath(atp, null, cy.nodes().diff(atp).left, {
           virtualEdges: true,
-          fillStyle: 'rgba(255, 0, 0, 0.2)',
-          strokeStyle: 'red',
+          style: {
+            fill: 'rgba(255, 0, 0, 0.2)',
+            stroke: 'red',
+          },
         });
         const edges = cy.$('node#glyph20').connectedEdges();
         const nodes = edges.connectedNodes();
         bb.addPath(nodes, edges, cy.nodes().diff(nodes).left, {
           virtualEdges: true,
-          fillStyle: 'rgba(70, 130, 180, 0.2)',
-          strokeStyle: 'steelblue',
+          style: {
+            fill: 'rgba(70, 130, 180, 0.2)',
+            stroke: 'steelblue',
+          },
         });
       });
     </script>
