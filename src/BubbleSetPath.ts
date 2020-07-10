@@ -316,27 +316,19 @@ export default class BubbleSetPath {
       this.#options
     );
 
-    this.node.setAttribute('d', path.sample(8).simplify(0).bSplines().simplify(0).toString());
+    this.node.setAttribute('d', path.sample(8).simplify(0).bSplines().simplify(0).toString(2));
   };
 
-  remove() {
-    this.nodes.off('position', undefined, this.#throttledUpdate);
-    this.nodes.off('add', undefined, this.#adder);
-    this.nodes.off('remove', undefined, this.#remover);
-    this.avoidNodes.off('position', undefined, this.#throttledUpdate);
-    this.avoidNodes.off('add', undefined, this.#adder);
-    this.avoidNodes.off('remove', undefined, this.#remover);
-    this.avoidNodes.forEach((d) => {
-      d.scratch(SCRATCH_KEY, {});
-    });
-    this.nodes.forEach((d) => {
-      d.scratch(SCRATCH_KEY, {});
-    });
+  private get elements() {
+    return this.nodes.copy().merge(this.edges).merge(this.avoidNodes);
+  }
 
-    this.edges.off('move position', undefined, this.#throttledUpdate);
-    this.edges.off('add', undefined, this.#adder);
-    this.edges.off('remove', undefined, this.#remover);
-    this.edges.forEach((d) => {
+  remove() {
+    const elems = this.elements;
+    elems.off('move position', undefined, this.#throttledUpdate);
+    elems.off('add', undefined, this.#adder);
+    elems.off('remove', undefined, this.#remover);
+    elems.forEach((d) => {
       d.scratch(SCRATCH_KEY, {});
     });
     this.node.remove();
