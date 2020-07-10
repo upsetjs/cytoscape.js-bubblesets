@@ -80,8 +80,8 @@ yarn release:pre
 
 [npm-image]: https://badge.fury.io/js/cytoscape-bubblesets.svg
 [npm-url]: https://npmjs.org/package/sgratzl/cytoscape-bubblesets
-[github-actions-image]: https://github.com/sgratzl/cytoscape.js-bubblesets/workflows/ci/badge.svg
-[github-actions-url]: https://github.com/sgratzl/cytoscape.js-bubblesets/actions
+[github-actions-image]: https://github.com/upsetjs/cytoscape.js-bubblesets/workflows/ci/badge.svg
+[github-actions-url]: https://github.com/upsetjs/cytoscape.js-bubblesets/actions
 [cytoscape-image]: https://img.shields.io/badge/Cytoscape-plugin-yellow
 [cytoscape-url]: https://js.cytoscape.org/#extensions/ui-extensions
 [codepen]: https://img.shields.io/badge/CodePen-open-blue?logo=codepen

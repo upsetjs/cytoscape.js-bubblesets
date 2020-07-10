@@ -29,7 +29,7 @@ module.exports = {
     );
     config.output.banner = `/**
  * cytoscape-bubblesets
- * https://github.com/sgratzl/cytoscape.js-bubblesets
+ * https://github.com/upsetjs/cytoscape.js-bubblesets
  *
  * Copyright (c) 2020 Samuel Gratzl <sam@sgratzl.com>
  */`;
