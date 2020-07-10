@@ -2,7 +2,7 @@
 
 [![NPM Package][npm-image]][npm-url] [![Github Actions][github-actions-image]][github-actions-url] [![Cytoscape Plugin][cytoscape-image]][cytoscape-url]
 
-A [Cytoscape.js](https://js.cytoscape.org) plugin for rendering [Bubblesets](https://github.com/sgratzl/bubblesets-js).
+A [Cytoscape.js](https://js.cytoscape.org) plugin for rendering [Bubblesets](https://github.com/upsetjs/bubblesets-js).
 
 ![Euler Example](https://user-images.githubusercontent.com/4129778/83965199-249aef00-a8b2-11ea-866e-4b0207c7b446.png)
 
@@ -14,7 +14,7 @@ npm install cytoscape cytoscape-bubblesets
 
 ## Usage
 
-see [Samples](https://github.com/sgratzl/cytoscape-bubblesets/tree/master/samples) on Github
+see [Samples](https://github.com/upsetjs/cytoscape-bubblesets/tree/master/samples) on Github
 
 or at this [![Open in CodePen][codepen]](https://codepen.io/sgratzl/pen/TODO)
 
@@ -109,7 +109,7 @@ yarn release:pre
 ```
 
 [npm-image]: https://badge.fury.io/js/cytoscape-bubblesets.svg
-[npm-url]: https://npmjs.org/package/sgratzl/cytoscape-bubblesets
+[npm-url]: https://npmjs.org/package/cytoscape-bubblesets
 [github-actions-image]: https://github.com/upsetjs/cytoscape.js-bubblesets/workflows/ci/badge.svg
 [github-actions-url]: https://github.com/upsetjs/cytoscape.js-bubblesets/actions
 [cytoscape-image]: https://img.shields.io/badge/Cytoscape-plugin-yellow

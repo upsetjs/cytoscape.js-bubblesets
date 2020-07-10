@@ -9,14 +9,14 @@ const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 export default class BubbleSetsPlugin {
   readonly svg: SVGSVGElement;
-  readonly #paths: BubbleSetPath[] = [];
+  readonly #layers: BubbleSetPath[] = [];
   readonly #adapter = {
     remove: (path: BubbleSetPath) => {
-      const index = this.#paths.indexOf(path);
+      const index = this.#layers.indexOf(path);
       if (index < 0) {
         return false;
       }
-      this.#paths.splice(index, 1);
+      this.#layers.splice(index, 1);
       return true;
     },
   };
@@ -51,7 +51,7 @@ export default class BubbleSetsPlugin {
   };
 
   destroy() {
-    for (const path of this.#paths) {
+    for (const path of this.#layers) {
       path.remove();
     }
     this.#cy.off('viewport', undefined, this.zoomed);
@@ -75,8 +75,8 @@ export default class BubbleSetsPlugin {
       avoidNodes ?? this.#cy.collection(),
       Object.assign({}, this.#options, options)
     );
-    this.#paths.push(path);
-    if (this.#paths.length === 1) {
+    this.#layers.push(path);
+    if (this.#layers.length === 1) {
       this.zoomed();
     }
     path.update();
@@ -84,11 +84,11 @@ export default class BubbleSetsPlugin {
   }
 
   getPaths() {
-    return this.#paths.slice();
+    return this.#layers.slice();
   }
 
   removePath(path: BubbleSetPath) {
-    const i = this.#paths.indexOf(path);
+    const i = this.#layers.indexOf(path);
     if (i < 0) {
       return false;
     }
@@ -104,7 +104,7 @@ export default class BubbleSetsPlugin {
 
   update() {
     this.zoomed();
-    this.#paths.forEach((p) => p.update());
+    this.#layers.forEach((p) => p.update());
   }
 }
 
