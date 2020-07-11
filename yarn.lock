@@ -3065,7 +3065,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bubblesets-js@npm:^2.1.0":
+"bubblesets-js@npm:^2.2.0":
   version: 2.2.0
   resolution: "bubblesets-js@npm:2.2.0"
   checksum: d132d8f6d5cd03f09d7550069e4fd0af593ca0dd51a67cac3696455345773f80ed414a5968da6e2caca13f93117be9c29385910bba6db1184c63c95b46d195fd
@@ -3625,6 +3625,7 @@ __metadata:
     "@yarnpkg/pnpify": ^2.1.0
     bubblesets-js: ^2.2.0
     cytoscape: ^3.15.0
+    cytoscape-layers: ^1.0.0
     eslint: ^7.4.0
     eslint-config-prettier: ^6.11.0
     eslint-config-react-app: ^5.2.1
@@ -3650,6 +3651,17 @@ __metadata:
     cytoscape: ^3.15.2
   languageName: unknown
   linkType: soft
+
+"cytoscape-layers@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "cytoscape-layers@npm:1.0.0"
+  dependencies:
+    "@types/cytoscape": ^3.14.7
+  peerDependencies:
+    cytoscape: ^3.15.2
+  checksum: 47ad2fc00ac018def958e0acedb687cd34871d1573fad97941503f601b1b3698259302c96771972661322c2b54621f73a6373f71e766e1e353fec68851dc4081
+  languageName: node
+  linkType: hard
 
 "cytoscape@npm:^3.15.0":
   version: 3.15.2

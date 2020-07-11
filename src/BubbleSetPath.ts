@@ -319,18 +319,16 @@ export default class BubbleSetPath {
     this.node.setAttribute('d', path.sample(8).simplify(0).bSplines().simplify(0).toString(2));
   };
 
-  private get elements() {
-    return this.nodes.copy().merge(this.edges).merge(this.avoidNodes);
-  }
-
   remove() {
-    const elems = this.elements;
-    elems.off('move position', undefined, this.#throttledUpdate);
-    elems.off('add', undefined, this.#adder);
-    elems.off('remove', undefined, this.#remover);
-    elems.forEach((d) => {
-      d.scratch(SCRATCH_KEY, {});
-    });
+    for (const set of [this.nodes, this.edges, this.avoidNodes]) {
+      set.off('move position', undefined, this.#throttledUpdate);
+      set.off('add', undefined, this.#adder);
+      set.off('remove', undefined, this.#remover);
+      set.forEach((d: cy.NodeSingular | cy.EdgeSingular) => {
+        d.scratch(SCRATCH_KEY, {});
+      });
+    }
+
     this.node.remove();
     return this.#adapter.remove(this);
   }

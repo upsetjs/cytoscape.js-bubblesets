@@ -12,6 +12,7 @@ module.exports = {
     // }
 
     config.output.globals['cytoscape'] = 'cytoscape';
+    config.output.globals['cytoscape-layers'] = 'CytoscapeLayers';
     const base = config.external;
     const external = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.peerDependencies || {}));
     config.external = (v) => (base(v) ? external.includes(v) : false);
