@@ -27,7 +27,7 @@ export default class BubbleSetsPlugin {
   constructor(cy: cy.Core, options: IBubbleSetsPluginOptions = {}) {
     this.#cy = cy;
     this.#options = options;
-    this.layer = options.layer ?? layers.call(cy).nodeLayer.insertBefore('svg');
+    this.layer = options.layer ?? layers(cy).nodeLayer.insertBefore('svg');
   }
 
   destroy() {
