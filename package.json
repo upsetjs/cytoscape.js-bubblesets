@@ -22,11 +22,11 @@
   },
   "global": "CytoscapeBubbleSets",
   "dependencies": {
-    "@types/cytoscape": "^3.14.7",
-    "cytoscape-layers": "^2.1.0"
+    "@types/cytoscape": "^3.14.7"
   },
   "peerDependencies": {
-    "cytoscape": "^3.17.0"
+    "cytoscape": "^3.17.0",
+    "cytoscape-layers": "^2.1.0"
   },
   "browserslist": [
     "Firefox ESR",
