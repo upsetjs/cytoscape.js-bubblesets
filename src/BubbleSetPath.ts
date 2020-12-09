@@ -307,7 +307,7 @@ export default class BubbleSetPath {
 
     const memberAreas = members.map((d) => d.area!);
     const nonMemberAreas = nonMembers.map((d) => d.area!);
-    let path = calculatePotentialOutline(
+    const path = calculatePotentialOutline(
       potentialArea,
       memberAreas,
       edges,

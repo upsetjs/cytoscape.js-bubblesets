@@ -1,10 +1,14 @@
 {
+  "eslint.enable": true,
   "editor.formatOnSave": true,
   "editor.formatOnType": true,
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[json]": {
@@ -19,5 +23,6 @@
   "editor.detectIndentation": false,
   "editor.tabSize": 2,
   "typescript.tsdk": ".yarn/sdks/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "npm.packageManager": "yarn"
 }
