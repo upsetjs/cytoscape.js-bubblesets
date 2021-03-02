@@ -5,15 +5,21 @@ export { default as BubbleSetsPlugin } from './BubbleSetsPlugin';
 export * from './BubbleSetPath';
 export { default as BubbleSetPath } from './BubbleSetPath';
 
-export default function register(
-  cytoscape: (type: 'core' | 'collection' | 'layout', name: string, extension: any) => void
-) {
+export type CytoscapeRegistry = {
+  (type: 'core' | 'collection' | 'layout', name: string, extension: unknown): void;
+};
+
+export default function register(cytoscape: CytoscapeRegistry): void {
   cytoscape('core', 'bubbleSets', bubbleSets);
 }
 
+function hasCytoscape(obj: unknown): obj is { cytoscape: CytoscapeRegistry } {
+  return typeof (obj as { cytoscape: CytoscapeRegistry }).cytoscape === 'function';
+}
+
 // auto register
-if (typeof (window as any).cytoscape !== 'undefined') {
-  register((window as any).cytoscape);
+if (hasCytoscape(window)) {
+  register(window.cytoscape);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace

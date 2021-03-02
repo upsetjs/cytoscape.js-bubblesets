@@ -154,7 +154,7 @@ export default class BubbleSetPath {
     edges.on('remove', this.#remover);
   }
 
-  update = () => {
+  update = (forceUpdate = false): void => {
     const bb = this.nodes.union(this.edges).boundingBox(this.#options);
     let potentialAreaDirty = false;
     const padding = Math.max(this.#options.edgeR1, this.#options.nodeR1) + this.#options.morphBuffer;
@@ -164,7 +164,7 @@ export default class BubbleSetPath {
       width: bb.w + padding * 2,
       height: bb.h + padding * 2,
     };
-    if (this.#activeArea.x !== nextPotentialBB.x || this.#activeArea.y !== nextPotentialBB.y) {
+    if (forceUpdate || this.#activeArea.x !== nextPotentialBB.x || this.#activeArea.y !== nextPotentialBB.y) {
       potentialAreaDirty = true;
       this.#potentialArea = Area.fromPixelRegion(nextPotentialBB, this.#options.pixelGroup);
     } else if (this.#activeArea.width !== nextPotentialBB.width || this.#activeArea.height !== nextPotentialBB.height) {
@@ -187,7 +187,7 @@ export default class BubbleSetPath {
 
     let updateEdges = false;
     const updateNodeData = (n: cy.NodeSingular) => {
-      const bb = n.boundingBox(this.#options);
+      const nodeBB = n.boundingBox(this.#options);
       let data = (n.scratch(SCRATCH_KEY) ?? null) as IBubbleSetNodeData | null;
       const isCircle = isCircleShape(n.style('shape'));
       if (
@@ -195,34 +195,35 @@ export default class BubbleSetPath {
         potentialAreaDirty ||
         !data.area ||
         data.isCircle !== isCircle ||
-        data.shape.width !== bb.w ||
-        data.shape.height !== bb.h
+        data.shape.width !== nodeBB.w ||
+        data.shape.height !== nodeBB.h
       ) {
         // full recreate
         updateEdges = true;
         data = {
           isCircle,
-          shape: createShape(isCircle, bb),
+          shape: createShape(isCircle, nodeBB),
         };
         const key = toNodeKey(data);
-        if (cache.has(key)) {
-          data.area = this.#potentialArea.copy(cache.get(key)!, {
-            x: bb.x1 - this.#options.nodeR1,
-            y: bb.y1 - this.#options.nodeR1,
+        const cached = cache.get(key);
+        if (cached != null) {
+          data.area = this.#potentialArea.copy(cached, {
+            x: nodeBB.x1 - this.#options.nodeR1,
+            y: nodeBB.y1 - this.#options.nodeR1,
           });
         } else {
-          data.area = data!.isCircle
-            ? createGenericInfluenceArea(data!.shape, potentialArea, this.#options.nodeR1)
-            : createRectangleInfluenceArea(data!.shape, potentialArea, this.#options.nodeR1);
-          cache.set(key, data.area!);
+          data.area = data.isCircle
+            ? createGenericInfluenceArea(data.shape, potentialArea, this.#options.nodeR1)
+            : createRectangleInfluenceArea(data.shape, potentialArea, this.#options.nodeR1);
+          cache.set(key, data.area);
         }
         n.scratch(SCRATCH_KEY, data);
-      } else if (data.shape.x !== bb.x1 || data.shape.y !== bb.y1) {
+      } else if (data.shape.x !== nodeBB.x1 || data.shape.y !== nodeBB.y1) {
         updateEdges = true;
-        data.shape = createShape(isCircle, bb);
-        data.area = this.#potentialArea.copy(data.area!, {
-          x: bb.x1 - this.#options.nodeR1,
-          y: bb.y1 - this.#options.nodeR1,
+        data.shape = createShape(isCircle, nodeBB);
+        data.area = this.#potentialArea.copy(data.area, {
+          x: nodeBB.x1 - this.#options.nodeR1,
+          y: nodeBB.y1 - this.#options.nodeR1,
         });
       }
 
@@ -250,8 +251,9 @@ export default class BubbleSetPath {
     }
     const updateEdgeArea = (line: ILine) => {
       const key = toEdgeKey(line);
-      if (edgeCache.has(key)) {
-        return edgeCache.get(key)!;
+      const cached = edgeCache.get(key);
+      if (cached != null) {
+        return cached;
       }
       const r = createLineInfluenceArea(line, this.#potentialArea, this.#options.edgeR1);
       edgeCache.set(key, r);
@@ -306,8 +308,8 @@ export default class BubbleSetPath {
       }
     }
 
-    const memberAreas = members.map((d) => d.area!);
-    const nonMemberAreas = nonMembers.map((d) => d.area!);
+    const memberAreas = members.filter((d): d is typeof d & { area: Area } => d.area != null).map((d) => d.area);
+    const nonMemberAreas = nonMembers.filter((d): d is typeof d & { area: Area } => d.area != null).map((d) => d.area);
     const path = calculatePotentialOutline(
       potentialArea,
       memberAreas,
@@ -320,7 +322,7 @@ export default class BubbleSetPath {
     this.node.setAttribute('d', path.sample(8).simplify(0).bSplines().simplify(0).toString(2));
   };
 
-  remove() {
+  remove(): boolean {
     for (const set of [this.nodes, this.edges, this.avoidNodes]) {
       set.off('move position', undefined, this.#throttledUpdate);
       set.off('add', undefined, this.#adder);
