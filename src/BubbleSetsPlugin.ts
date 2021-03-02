@@ -1,6 +1,6 @@
-import cy from 'cytoscape';
-import BubbleSetPath, { IBubbleSetPathOptions } from './BubbleSetPath';
+import type cy from 'cytoscape';
 import { layers, ISVGLayer } from 'cytoscape-layers';
+import BubbleSetPath, { IBubbleSetPathOptions } from './BubbleSetPath';
 
 export interface IBubbleSetsPluginOptions extends IBubbleSetPathOptions {
   layer?: ISVGLayer;
@@ -10,7 +10,9 @@ const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 export default class BubbleSetsPlugin {
   readonly layer: ISVGLayer;
+
   readonly #layers: BubbleSetPath[] = [];
+
   readonly #adapter = {
     remove: (path: BubbleSetPath) => {
       const index = this.#layers.indexOf(path);
@@ -21,7 +23,9 @@ export default class BubbleSetsPlugin {
       return true;
     },
   };
+
   readonly #cy: cy.Core;
+
   readonly #options: IBubbleSetsPluginOptions;
 
   constructor(cy: cy.Core, options: IBubbleSetsPluginOptions = {}) {
@@ -51,7 +55,7 @@ export default class BubbleSetsPlugin {
       nodes,
       edges ?? this.#cy.collection(),
       avoidNodes ?? this.#cy.collection(),
-      Object.assign({}, this.#options, options)
+      { ...this.#options, ...options }
     );
     this.#layers.push(path);
     path.update();

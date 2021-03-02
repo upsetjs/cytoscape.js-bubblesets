@@ -1,4 +1,4 @@
-import cy from 'cytoscape';
+import type cy from 'cytoscape';
 import {
   IOutlineOptions,
   Area,
@@ -30,7 +30,7 @@ export interface IBubbleSetPathOptions extends IOutlineOptions, IPotentialOption
 }
 
 export interface ISVGPathStyle {
-  style?: CSSStyleDeclaration;
+  style?: Partial<CSSStyleDeclaration>;
   className?: string;
 }
 
@@ -75,13 +75,19 @@ function createShape(isCircle: boolean, bb: cy.BoundingBox12 & cy.BoundingBoxWH)
 
 export default class BubbleSetPath {
   #activeArea: IRectangle = { x: 0, y: 0, width: 0, height: 0 };
+
   #potentialArea: Area = new Area(4, 0, 0, 0, 0, 0, 0);
+
   readonly #options: Required<IBubbleSetPathOptions>;
+
   readonly #virtualEdgeAreas = new Map<string, Area>();
 
   readonly #throttledUpdate: () => void;
+
   readonly #adder: (e: cy.EventObject) => void;
+
   readonly #remover: (e: cy.EventObject) => void;
+
   readonly #adapter: { remove(path: BubbleSetPath): boolean };
 
   constructor(
@@ -93,29 +99,24 @@ export default class BubbleSetPath {
     options: IBubbleSetPathOptions = {}
   ) {
     this.#adapter = adapter;
-    this.#options = Object.assign(
-      {},
-      defaultOptions,
-      {
-        style: {
-          stroke: 'black',
-          fill: 'black',
-          fillOpacity: 0.25,
-        },
-        className: '',
-        throttle: 100,
-        virtualEdges: false,
-        interactive: false,
+    this.#options = {
+      ...defaultOptions,
+      style: {
+        stroke: 'black',
+        fill: 'black',
+        fillOpacity: '0.25',
       },
-      {
-        includeLabels: false,
-        includeMainLabels: false,
-        includeOverlays: false,
-        includeSourceLabels: false,
-        includeTargetLabels: false,
-      },
-      options
-    );
+      className: '',
+      throttle: 100,
+      virtualEdges: false,
+      interactive: false,
+      includeLabels: false,
+      includeMainLabels: false,
+      includeOverlays: false,
+      includeSourceLabels: false,
+      includeTargetLabels: false,
+      ...options,
+    };
 
     Object.assign(this.node.style, this.#options.style);
     if (this.#options.className) {
@@ -259,7 +260,7 @@ export default class BubbleSetPath {
     const edges: Area[] = [];
 
     this.edges.forEach((e: cy.EdgeSingular) => {
-      const ps = (e.segmentPoints() ?? [e.sourceEndpoint(), e.targetEndpoint()]).map((d) => Object.assign({}, d));
+      const ps = (e.segmentPoints() ?? [e.sourceEndpoint(), e.targetEndpoint()]).map((d) => ({ ...d }));
       if (ps.length === 0) {
         return;
       }

@@ -8,7 +8,7 @@
     "sourceMap": true,
     "strict": true,
     "removeComments": true,
-    "importsNotUsedAsValues": "remove",
+    "importsNotUsedAsValues": "error",
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "strictBindCallApply": true,
@@ -32,12 +32,12 @@
   "include": ["src/**/*.ts", "src/**/*.tsx"],
 
   "typedocOptions": {
-    "name": "TSLibrary",
+    "name": "Cytoscape.js BubbleSets",
     "out": "./docs",
     "theme": "minimal",
     "excludeExternals": true,
     "excludePrivate": true,
     "includeVersion": true,
-    "hideGenerator": true,
+    "hideGenerator": true
   }
 }

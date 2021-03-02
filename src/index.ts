@@ -1,4 +1,5 @@
 import { bubbleSets } from './BubbleSetsPlugin';
+
 export * from './BubbleSetsPlugin';
 export { default as BubbleSetsPlugin } from './BubbleSetsPlugin';
 export * from './BubbleSetPath';

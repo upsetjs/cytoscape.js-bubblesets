@@ -26,6 +26,7 @@ const watchOnly = ['umd'];
 const isDependency = (v) => Object.keys(pkg.dependencies || {}).some((e) => e === v || v.startsWith(e + '/'));
 const isPeerDependency = (v) => Object.keys(pkg.peerDependencies || {}).some((e) => e === v || v.startsWith(e + '/'));
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function Config(options) {
   const buildFormat = (format) => !options.watch || watchOnly.includes(format);
 
@@ -47,9 +48,12 @@ export default function Config(options) {
       resolve(),
       commonjs(),
       replace({
-        // eslint-disable-next-line no-undef
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV) || 'production',
-        __VERSION__: JSON.stringify(pkg.version),
+        preventAssignment: true,
+        values: {
+          // eslint-disable-next-line no-undef
+          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV) || 'production',
+          __VERSION__: JSON.stringify(pkg.version),
+        },
       }),
     ],
   };
@@ -101,6 +105,9 @@ export default function Config(options) {
       },
       plugins: [
         dts({
+          compilerOptions: {
+            removeComments: false,
+          },
           respectExternal: true,
         }),
       ],
