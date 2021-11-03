@@ -6,9 +6,12 @@ npm-debug.log*
 /coverage
 /node_modules
 .npm
-/.yarnrc.yml
-/.yarn
-/.pnp.js
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/versions
+.pnp.*
 
 # Build files
 /.tmp
@@ -17,4 +20,6 @@ npm-debug.log*
 *.tgz
 /.vscode/extensions.json
 /docs
+samples/*.map
+samples/*.js
 *.tsbuildinfo
