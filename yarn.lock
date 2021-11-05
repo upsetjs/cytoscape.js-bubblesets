@@ -1783,7 +1783,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/cytoscape@npm:^3.14.7, @types/cytoscape@npm:^3.19.0":
+"@types/cytoscape@npm:^3.19.0":
   version: 3.19.0
   resolution: "@types/cytoscape@npm:3.19.0"
   checksum: 869371dc67b48d2ce67d60742b0f0240d1187c94264c60f1506365592515b1d1e7bce815fa608bce97dc5c8945521774936ae5a202dbab8cb1b5cfa69c7d3edb
@@ -3097,7 +3097,7 @@ __metadata:
     "@yarnpkg/sdks": ^2.5.0
     bubblesets-js: ^2.2.0
     cytoscape: ^3.20.0
-    cytoscape-layers: ^2.1.0
+    cytoscape-layers: ^2.2.0
     eslint: ^8.1.0
     eslint-config-airbnb-typescript: ^14.0.1
     eslint-config-prettier: ^8.3.0
@@ -3121,18 +3121,18 @@ __metadata:
     typescript: ^4.4.4
   peerDependencies:
     cytoscape: ^3.20.0
-    cytoscape-layers: ^2.1.0
+    cytoscape-layers: ^2.2.0
   languageName: unknown
   linkType: soft
 
-"cytoscape-layers@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "cytoscape-layers@npm:2.1.0"
+"cytoscape-layers@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "cytoscape-layers@npm:2.2.0"
   dependencies:
-    "@types/cytoscape": ^3.14.7
+    "@types/cytoscape": ^3.19.0
   peerDependencies:
-    cytoscape: ^3.15.2
-  checksum: 051b027dddcc71ea97181c197edcf13ae9320eee106b9cd484f99f8f560255e809d3b8b8c33d3e374b6e4117fc619193ddcd05e64e01588ec164447ba2516ca5
+    cytoscape: ^3.20.0
+  checksum: 591cb3669d929528787d6007a754dbdacc010ce78462c8b5173515e3df1b19b9873cccec8c6378438909df0ce13f6fd15f01845aba4b9ba9f601268813a159a7
   languageName: node
   linkType: hard
 
