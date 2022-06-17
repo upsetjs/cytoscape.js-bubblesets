@@ -16,7 +16,7 @@ npm install cytoscape cytoscape-bubblesets
 
 see [Samples](./samples) on Github
 
-or at this [![Open in CodePen][codepen]](https://codepen.io/sgratzl/pen/TODO)
+or at this [![Open in CodePen][codepen]](https://codepen.io/sgratzl/pen/RwQdBLY)
 
 ```js
 import cytoscape from 'cytoscape';
