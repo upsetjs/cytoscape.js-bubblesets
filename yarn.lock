@@ -3048,10 +3048,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bubblesets-js@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "bubblesets-js@npm:2.2.0"
-  checksum: db35ff42fc60b06cfa446174d14fb0b039c59f58c042b895bf000b6596c6784b874c1b6b39e351bb8a69471b713b1f28417e5398e0369f04bf91cfe299ed9ce0
+"bubblesets-js@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "bubblesets-js@npm:2.3.0"
+  checksum: 551300a88d86d2cf686441351fd7f6040ab11de68195277f49527c2c0c8d11838275121683a46d788b6b9e8c42ce28749b309231784471ef547b4f747fc61b4b
   languageName: node
   linkType: hard
 
@@ -3443,7 +3443,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.42.1
     "@typescript-eslint/parser": ^5.42.1
     "@yarnpkg/sdks": ^2.6.3
-    bubblesets-js: ^2.2.0
+    bubblesets-js: ^2.3.0
     cytoscape: ^3.23.0
     cytoscape-layers: ^2.3.0
     eslint: ^8.27.0

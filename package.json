@@ -24,7 +24,7 @@
   "dependencies": {
     "@types/cytoscape": "^3.19.9",
     "@types/lodash.throttle": "^4.1.7",
-    "bubblesets-js": "^2.2.0",
+    "bubblesets-js": "^2.3.0",
     "lodash.throttle": "^4.1.1"
   },
   "peerDependencies": {
