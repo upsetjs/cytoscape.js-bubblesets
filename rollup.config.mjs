@@ -13,7 +13,7 @@ const pkg = JSON.parse(fs.readFileSync('./package.json'));
 function resolveYear() {
   // Extract copyrights from the LICENSE.
   const license = fs.readFileSync('./LICENSE', 'utf-8').toString();
-  const matches = Array.from(license.matchAll(/\(c\) (\d+)/gm));
+  const matches = Array.from(license.matchAll(/\(c\) (\d+-\d+)/gm));
   if (!matches || matches.length === 0) {
     return 2021;
   }
@@ -79,19 +79,19 @@ export default function Config(options) {
         },
         buildFormat('cjs') && {
           ...base.output,
-          file: pkg.main,
+          file: pkg.require,
           format: 'cjs',
         },
       ].filter(Boolean),
     },
-    ((buildFormat('umd') && pkg.browser) || (buildFormat('umd-min') && pkg.unpkg)) && {
+    ((buildFormat('umd') && pkg.umd) || (buildFormat('umd-min') && pkg.unpkg)) && {
       ...base,
       input: fs.existsSync(base.input.replace('.ts', '.umd.ts')) ? base.input.replace('.ts', '.umd.ts') : base.input,
       output: [
         buildFormat('umd') &&
-          pkg.browser && {
+          pkg.umd && {
             ...base.output,
-            file: pkg.browser,
+            file: pkg.umd,
             format: 'umd',
             name: pkg.global,
           },
