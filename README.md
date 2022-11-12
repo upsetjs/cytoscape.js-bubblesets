@@ -9,14 +9,14 @@ A [Cytoscape.js](https://js.cytoscape.org) plugin for rendering [Bubblesets](htt
 ## Install
 
 ```sh
-npm install cytoscape cytoscape-bubblesets
+npm install cytoscape cytoscape-layers cytoscape-bubblesets
 ```
 
 ## Usage
 
 see [Samples](./samples) on Github
 
-or at this [![Open in CodePen][codepen]](https://codepen.io/sgratzl/pen/TODO)
+or at this [![Open in CodePen][codepen]](https://codepen.io/sgratzl/pen/RwQdBLY)
 
 ```js
 import cytoscape from 'cytoscape';
