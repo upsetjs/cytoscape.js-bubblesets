@@ -84,6 +84,10 @@
     "typedoc": "^0.25.7",
     "typescript": "^5.3.3"
   },
+  "resolutions": {
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0"
+  },
   "scripts": {
     "clean": "rimraf build docs node_modules \"*.tgz\" \"*.tsbuildinfo\" \"samples/*.js\" \"samples/*.map\"",
     "compile": "tsc -b tsconfig.c.json",
