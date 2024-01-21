@@ -1,6 +1,6 @@
 import type cy from 'cytoscape';
-import { layers, ISVGLayer } from 'cytoscape-layers';
-import BubbleSetPath, { IBubbleSetPathOptions } from './BubbleSetPath';
+import { layers, type ISVGLayer } from 'cytoscape-layers';
+import BubbleSetPath, { type IBubbleSetPathOptions } from './BubbleSetPath';
 
 export interface IBubbleSetsPluginOptions extends IBubbleSetPathOptions {
   layer?: ISVGLayer;

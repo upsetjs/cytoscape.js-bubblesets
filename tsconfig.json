@@ -8,7 +8,7 @@
     "sourceMap": true,
     "strict": true,
     "removeComments": true,
-    "importsNotUsedAsValues": "error",
+    "verbatimModuleSyntax": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "strictBindCallApply": true,
@@ -26,8 +26,8 @@
     "noEmit": true,
     "paths": {
       "@": ["./src"],
-      "*": ["*", "node_modules/*"]
-    }
+      "*": ["*", "node_modules/*"],
+    },
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
 
@@ -38,6 +38,6 @@
     "excludeExternals": true,
     "excludePrivate": true,
     "includeVersion": true,
-    "hideGenerator": true
-  }
+    "hideGenerator": true,
+  },
 }

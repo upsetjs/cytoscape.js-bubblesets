@@ -1,6 +1,6 @@
 import type cy from 'cytoscape';
 import {
-  IOutlineOptions,
+  type IOutlineOptions,
   Area,
   createLineInfluenceArea,
   createGenericInfluenceArea,
@@ -8,12 +8,12 @@ import {
   Rectangle,
   Circle,
   calculatePotentialOutline,
-  IRectangle,
-  IPotentialOptions,
+  type IRectangle,
+  type IPotentialOptions,
   defaultOptions,
   calculateVirtualEdges,
-  IRoutingOptions,
-  ILine,
+  type IRoutingOptions,
+  type ILine,
   Line,
 } from 'bubblesets-js';
 import throttle from 'lodash.throttle';
