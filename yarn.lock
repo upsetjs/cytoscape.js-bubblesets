@@ -2409,7 +2409,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/cytoscape@npm:^3.19.16, @types/cytoscape@npm:^3.21.2":
+"@types/cytoscape@npm:^3.21.2":
   version: 3.21.2
   resolution: "@types/cytoscape@npm:3.21.2"
   checksum: 10c0/6a3dd6c3ac0f3502a2f5116033cd090f22c22cbcc66a7c2b65bb0f9a122a5177f58d152602105d60f80b9be779bef9aba530cf353b083a88081316c7db22168e
@@ -3824,16 +3824,16 @@ __metadata:
   linkType: soft
 
 "cytoscape-layers@npm:^2.4.4":
-  version: 2.4.4
-  resolution: "cytoscape-layers@npm:2.4.4"
+  version: 2.4.5
+  resolution: "cytoscape-layers@npm:2.4.5"
   dependencies:
-    "@types/cytoscape": "npm:^3.19.16"
+    "@types/cytoscape": "npm:^3.21.2"
   peerDependencies:
     cytoscape: ^3.23.0
   dependenciesMeta:
     cytoscape@3.23.0:
       unplugged: true
-  checksum: 10c0/24da760d286939cdcfa0e4b5afc2d19a2240231bac390a12b0c8cd09ee88a6eba2023aa3ead43dc21c5dd7f3b64629af235f5ea3742d8701660e9fef56ef9dc9
+  checksum: 10c0/5b81f8ad5ed68710ae199ce1d8c4251b5fb1e33831d4e2b92284d435d22b64da3a6b7dfef4ca541b757ef9db7c1d86e27553a0b9ced7050e3b9f0cb55c092a69
   languageName: node
   linkType: hard
 
