@@ -3426,9 +3426,9 @@ __metadata:
   linkType: hard
 
 "bubblesets-js@npm:^2.3.2":
-  version: 2.3.2
-  resolution: "bubblesets-js@npm:2.3.2"
-  checksum: 10c0/adc06db6de6f54886d08b4c4ba500dcca2dc3f6c6a80ea66f3172b9464f046531ce7b260221c69afaeed3269968a7392ac0dcc0c3d75db8178ce60a25fa88ea5
+  version: 2.3.3
+  resolution: "bubblesets-js@npm:2.3.3"
+  checksum: 10c0/39ae91a38e831bbeda261fe0f0ac032891eedae617c0d3c0a67d71f455964e061058216b7bcedff173a10a70481c7e48866bb9cb787d3b0cc6ec45eec29b638f
   languageName: node
   linkType: hard
 
