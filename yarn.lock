@@ -2410,9 +2410,9 @@ __metadata:
   linkType: hard
 
 "@types/cytoscape@npm:^3.21.2":
-  version: 3.21.2
-  resolution: "@types/cytoscape@npm:3.21.2"
-  checksum: 10c0/6a3dd6c3ac0f3502a2f5116033cd090f22c22cbcc66a7c2b65bb0f9a122a5177f58d152602105d60f80b9be779bef9aba530cf353b083a88081316c7db22168e
+  version: 3.21.4
+  resolution: "@types/cytoscape@npm:3.21.4"
+  checksum: 10c0/ed08c3b81b0b30172bce07f1ba4a7b322326ab59fc86e260c878a4ccfacea9885ad84707de1aad1b1feca8e594e132f8766ad98c24f9abe0ce4d721b6394ae67
   languageName: node
   linkType: hard
 
@@ -3838,9 +3838,9 @@ __metadata:
   linkType: hard
 
 "cytoscape@npm:^3.29.2":
-  version: 3.29.2
-  resolution: "cytoscape@npm:3.29.2"
-  checksum: 10c0/fbd2b32496cc866429f2851200653dc1788c809bcb4da85e17054a0d4cd5a531cdebcf20d404c289b6ef7d0f914c107645372d958deb693458de15665b8fdf8b
+  version: 3.30.0
+  resolution: "cytoscape@npm:3.30.0"
+  checksum: 10c0/ffd463f27975b7d979c6f1a8c3472d95cbe2d75dc820aac27ad3e253eaa877da4c7ed4632a341394d911ba1804c5786a292a56387bbb34fcf0c9db69286e123e
   languageName: node
   linkType: hard
 
