@@ -3791,7 +3791,7 @@ __metadata:
     "@types/jest": "npm:^29.5.12"
     "@types/lodash.throttle": "npm:^4.1.9"
     "@typescript-eslint/eslint-plugin": "npm:^7.12.0"
-    "@typescript-eslint/parser": "npm:^7.12.0"
+    "@typescript-eslint/parser": "npm:^8.0.0"
     "@yarnpkg/sdks": "npm:^3.1.2"
     bubblesets-js: "npm:^2.3.2"
     cytoscape: "npm:^3.29.2"
