@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,4 +28,11 @@ jobs:
       - run: yarn build
       - run: yarn lint
       - run: yarn test:coverage
-      - run: yarn docs
+      # - run: yarn docs
+      # - name: Deploy
+      #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./docs
+      #     enable_jekyll: false
