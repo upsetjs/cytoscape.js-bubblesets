@@ -24,20 +24,21 @@
   "dependencies": {
     "@types/cytoscape": "^3.21.8",
     "@types/lodash.throttle": "^4.1.9",
-    "bubblesets-js": "^2.3.4",
+    "bubblesets-js": "^3.0.0",
     "lodash.throttle": "^4.1.1"
   },
   "peerDependencies": {
     "cytoscape": "^3.23.0",
-    "cytoscape-layers": "^2.3.0"
+    "cytoscape-layers": "^3.0.0"
   },
   "browserslist": [
     "Firefox ESR",
     "last 2 Chrome versions",
     "last 2 Firefox versions"
   ],
+  "type": "module",
+  "main": "build/index.js",
   "module": "build/index.js",
-  "main": "build/index.cjs",
   "require": "build/index.cjs",
   "umd": "build/index.umd.js",
   "unpkg": "build/index.umd.min.js",
@@ -69,8 +70,8 @@
     "@vitest/coverage-v8": "^2.1.5",
     "@yarnpkg/sdks": "^3.2.0",
     "cytoscape": "^3.30.3",
-    "cytoscape-layers": "^2.4.6",
-    "eslint": "~9.15.0",
+    "cytoscape-layers": "^3.0.0",
+    "eslint": "~9.14.0",
     "eslint-plugin-prettier": "^5.2.1",
     "jsdom": "^25.0.1",
     "prettier": "^3.3.3",
