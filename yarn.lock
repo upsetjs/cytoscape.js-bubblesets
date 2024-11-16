@@ -1352,10 +1352,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:9.14.0, @eslint/js@npm:~9.14.0":
+"@eslint/js@npm:9.14.0":
   version: 9.14.0
   resolution: "@eslint/js@npm:9.14.0"
   checksum: 10c0/a423dd435e10aa3b461599aa02f6cbadd4b5128cb122467ee4e2c798e7ca4f9bb1fce4dcea003b29b983090238cf120899c1af657cf86300b399e4f996b83ddc
+  languageName: node
+  linkType: hard
+
+"@eslint/js@npm:^9.15.0":
+  version: 9.15.0
+  resolution: "@eslint/js@npm:9.15.0"
+  checksum: 10c0/56552966ab1aa95332f70d0e006db5746b511c5f8b5e0c6a9b2d6764ff6d964e0b2622731877cbc4e3f0e74c5b39191290d5f48147be19175292575130d499ab
   languageName: node
   linkType: hard
 
@@ -2519,10 +2526,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bubblesets-js@npm:^2.3.4":
-  version: 2.3.4
-  resolution: "bubblesets-js@npm:2.3.4"
-  checksum: 10c0/68cc5d9d43b496e4756a3f2cbb2d8c614e209bbb77c5ed079572436d216d61c808e26e4f8f55adec252a9074ea4dfc1e9b90f56928533ca2f4c5c194bc3fc086
+"bubblesets-js@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "bubblesets-js@npm:3.0.0"
+  checksum: 10c0/1767558af5a5059a4e6f5a9b3976539a439da9c5c96f319a6819f8456e31fe7dc552c696d6f97d9ff83b254981195273588230c710c777e3790e63d259ed1be0
   languageName: node
   linkType: hard
 
@@ -2830,7 +2837,7 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.26.0"
     "@babel/preset-env": "npm:^7.26.0"
-    "@eslint/js": "npm:~9.14.0"
+    "@eslint/js": "npm:^9.15.0"
     "@rollup/plugin-babel": "npm:^6.0.4"
     "@rollup/plugin-commonjs": "npm:^28.0.1"
     "@rollup/plugin-node-resolve": "npm:^15.3.0"
@@ -2840,9 +2847,9 @@ __metadata:
     "@types/lodash.throttle": "npm:^4.1.9"
     "@vitest/coverage-v8": "npm:^2.1.5"
     "@yarnpkg/sdks": "npm:^3.2.0"
-    bubblesets-js: "npm:^2.3.4"
+    bubblesets-js: "npm:^3.0.0"
     cytoscape: "npm:^3.30.3"
-    cytoscape-layers: "npm:^2.4.6"
+    cytoscape-layers: "npm:^3.0.0"
     eslint: "npm:~9.14.0"
     eslint-plugin-prettier: "npm:^5.2.1"
     jsdom: "npm:^25.0.1"
@@ -2860,18 +2867,18 @@ __metadata:
     vitest: "npm:^2.1.5"
   peerDependencies:
     cytoscape: ^3.23.0
-    cytoscape-layers: ^2.3.0
+    cytoscape-layers: ^3.0.0
   languageName: unknown
   linkType: soft
 
-"cytoscape-layers@npm:^2.4.6":
-  version: 2.4.6
-  resolution: "cytoscape-layers@npm:2.4.6"
+"cytoscape-layers@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "cytoscape-layers@npm:3.0.0"
   dependencies:
     "@types/cytoscape": "npm:^3.21.8"
   peerDependencies:
     cytoscape: ^3.23.0
-  checksum: 10c0/02a50f86b241a133cc5bcd073d14a3cd5bd2a962028d06f46e8da187f8d6693e499dca940c210e855191814fe0fc64f60c32d4669f09f00e073e651d1026a9ab
+  checksum: 10c0/3a5270ffad8f2c7446b3143b814ad669b94032c0968bae3dd2ae75ccdd9f2b10966612244c87bc8309d45f9336e224284690d31264277bb8771bb86febcaecd4
   languageName: node
   linkType: hard
 
